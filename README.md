@@ -116,8 +116,8 @@ print(f"Memory saved: {stats.memory_saved_mb:.1f} MB")
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/KITSUNE_ALGO.git
-cd KITSUNE_ALGO
+git clone https://github.com/jeeth-kataria/Kitsune_optimization.git
+cd Kitsune_optimizationmizationmization
 
 # Install with core dependencies
 pip install -e .
@@ -501,17 +501,17 @@ This project draws inspiration from cutting-edge research and industry practices
 
 ## 📞 Contact & Citation
 
-**Maintainer**: Kitsune Team  
-**Project Link**: [https://github.com/yourusername/KITSUNE_ALGO](https://github.com/yourusername/KITSUNE_ALGO)
+**Maintainer**: Jeeth Kataria  
+**Project Link**: [https://github.com/jeeth-kataria/Kitsune_optimization](https://github.com/jeeth-kataria/Kitsune_optimizationtsune_optimizationtsune_optimization)
 
 If you use Kitsune in your research or projects, please consider citing:
 
 ```bibtex
 @software{kitsune2026,
   title = {Kitsune: CUDA-Accelerated Dataflow Scheduler for PyTorch},
-  author = {Kitsune Team},
+  author = {Jeeth Kataria},
   year = {2026},
-  url = {https://github.com/yourusername/KITSUNE_ALGO}
+  url = {https://github.com/jeeth-kataria/Kitsune_optimizationimizationimization}
 }
 ```
 
@@ -521,7 +521,7 @@ If you use Kitsune in your research or projects, please consider citing:
 
 **Made with ❤️ for the deep learning community**
 
-[![GitHub Stars](https://img.shields.io/github/stars/yourusername/KITSUNE_ALGO?style=social)](https://github.com/yourusername/KITSUNE_ALGO)
-[![GitHub Forks](https://img.shields.io/github/forks/yourusername/KITSUNE_ALGO?style=social)](https://github.com/yourusername/KITSUNE_ALGO/fork)
+[![GitHub Stars](https://img.shields.io/github/stars/jeeth-kataria/Kitsune_optimization?style=social)](https://github.com/jeeth-kataria/Kitsune_optimization)
+[![GitHub Forks](https://img.shields.io/github/forks/jeeth-kataria/Kitsune_optimization?style=social)](https://github.com/jeeth-kataria/Kitsune_optimizationtsune_optimizationtsune_optimization/fork)
 
 </div>
