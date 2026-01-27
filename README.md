@@ -117,7 +117,7 @@ print(f"Memory saved: {stats.memory_saved_mb:.1f} MB")
 ```bash
 # Clone the repository
 git clone https://github.com/jeeth-kataria/Kitsune_optimization.git
-cd Kitsune_optimizationmizationmization
+cd Kitsune_optimization
 
 # Install with core dependencies
 pip install -e .
@@ -388,7 +388,7 @@ python -m kitsune.profiler.memory_tracker examples/basic_usage.py
 
 Development timeline for the 8-week optimization competition:
 
-### ✅ Completed Milestones
+### ✅ Version 0.1.0 - Initial Release (January 2026)
 
 - [x] **Week 1**: Foundation & Baseline
   - PyTorch profiling infrastructure
@@ -405,33 +405,45 @@ Development timeline for the 8-week optimization competition:
   - Event-based synchronization
   - Parallel kernel dispatch
 
-- [x] **Week 4**: Memory Optimization (MVP)
+- [x] **Week 4**: Memory Optimization
   - Zero-copy memory pooling
   - Size-class binning
   - Tensor lifetime tracking
 
-### 🚧 In Progress
-
-- [ ] **Week 5**: Kernel Fusion + AMP
+- [x] **Week 5**: Kernel Fusion + AMP
   - Triton kernel compilation
   - LayerNorm/Dropout fusion
   - Automatic mixed precision integration
 
-- [ ] **Week 6**: Cost-Model Scheduling
-  - Operation cost estimation
-  - Dynamic scheduling policies
-  - Adaptive stream allocation
+- [x] **Week 6**: Dataflow Scheduling
+  - Dependency-aware task scheduling
+  - Multi-stream orchestration
+  - Priority queue management
 
-- [ ] **Week 7**: CUDA Graphs Integration
-  - Graph capture for static patterns
+- [x] **Week 7**: CUDA Graphs Integration
+  - Graph capture for repeated patterns
   - Replay optimization
-  - Conditional graph execution
+  - Event-based synchronization
 
-- [ ] **Week 8**: Polish & Documentation
+- [x] **Week 8**: Production Polish
+  - Comprehensive test suite (95%+ coverage)
+  - Profiling and metrics tools
+  - Performance benchmarks
   - API documentation
-  - Tutorial notebooks
-  - Performance tuning guide
-  - Publication-ready benchmarks
+
+### 🚀 Future Roadmap
+
+- [ ] **v0.2.0**: Advanced Features
+  - Multi-GPU support with pipeline parallelism
+  - Dynamic batching and adaptive scheduling
+  - Extended fusion pattern library
+  - Model-specific optimization profiles
+
+- [ ] **v0.3.0**: Ecosystem Integration
+  - Hugging Face Transformers integration
+  - TorchScript/ONNX export support
+  - Cloud deployment templates
+  - Interactive visualization dashboard
 
 ---
 
@@ -502,7 +514,7 @@ This project draws inspiration from cutting-edge research and industry practices
 ## 📞 Contact & Citation
 
 **Maintainer**: Jeeth Kataria  
-**Project Link**: [https://github.com/jeeth-kataria/Kitsune_optimization](https://github.com/jeeth-kataria/Kitsune_optimizationtsune_optimizationtsune_optimization)
+**Project Link**: [https://github.com/jeeth-kataria/Kitsune_optimization](https://github.com/jeeth-kataria/Kitsune_optimization)
 
 If you use Kitsune in your research or projects, please consider citing:
 
@@ -511,7 +523,7 @@ If you use Kitsune in your research or projects, please consider citing:
   title = {Kitsune: CUDA-Accelerated Dataflow Scheduler for PyTorch},
   author = {Jeeth Kataria},
   year = {2026},
-  url = {https://github.com/jeeth-kataria/Kitsune_optimizationimizationimization}
+  url = {https://github.com/jeeth-kataria/Kitsune_optimization}
 }
 ```
 
@@ -522,6 +534,6 @@ If you use Kitsune in your research or projects, please consider citing:
 **Made with ❤️ for the deep learning community**
 
 [![GitHub Stars](https://img.shields.io/github/stars/jeeth-kataria/Kitsune_optimization?style=social)](https://github.com/jeeth-kataria/Kitsune_optimization)
-[![GitHub Forks](https://img.shields.io/github/forks/jeeth-kataria/Kitsune_optimization?style=social)](https://github.com/jeeth-kataria/Kitsune_optimizationtsune_optimizationtsune_optimization/fork)
+[![GitHub Forks](https://img.shields.io/github/forks/jeeth-kataria/Kitsune_optimization?style=social)](https://github.com/jeeth-kataria/Kitsune_optimization/fork)
 
 </div>

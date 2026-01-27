@@ -26,7 +26,7 @@ Example:
     >>> print(optimizer.summary())
 """
 
-__version__ = "1.0.0"  # Final release - Competition ready
+__version__ = "0.1.0"  # Initial release
 __author__ = "Kitsune Team"
 
 # Profiler (Week 1)

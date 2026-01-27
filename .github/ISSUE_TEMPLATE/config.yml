@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Questions & Discussions
+    url: https://github.com/jeeth-kataria/Kitsune_optimization/discussions
+    about: Ask questions, share ideas, and discuss Kitsune with the community
+  - name: 📖 Documentation
+    url: https://github.com/jeeth-kataria/Kitsune_optimization#readme
+    about: Read the documentation, API reference, and usage examples
+  - name: 📊 Benchmark Results
+    url: https://github.com/jeeth-kataria/Kitsune_optimization#-benchmarks
+    about: View performance benchmarks and reproduction instructions
