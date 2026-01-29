@@ -15,7 +15,7 @@ from typing import Dict, List, Tuple
 # Import Kitsune
 try:
     import kitsune
-    from kitsune import optimize
+    from kitsune import optimize_model
 except ImportError:
     print("ERROR: Kitsune not installed. Run: pip install torch-kitsune")
     exit(1)
@@ -111,14 +111,8 @@ def benchmark_kitsune(model: nn.Module, input_data: torch.Tensor,
     """Benchmark with Kitsune optimization"""
     
     # Apply Kitsune optimization
-    model = optimize(
-        model,
-        enable_amp=True,
-        enable_fusion=True,
-        enable_stream_parallel=True,
-        enable_memory_pool=True,
-        enable_prefetch=True
-    )
+    optimizer = optimize_model(model, input_data)
+    model = optimizer.model
     
     model.eval()
     device = input_data.device
