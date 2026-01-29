@@ -469,6 +469,31 @@ Contributions are welcome! This project is part of an ongoing research effort to
 
 ---
 
+## 📚 Documentation
+
+Comprehensive documentation is available with examples, tutorials, and API reference.
+
+### View Documentation Locally
+
+```bash
+# Quick start - just run this!
+./run_docs.sh
+```
+
+Then open http://127.0.0.1:8000 in your browser.
+
+**What's included:**
+- 🏠 Homepage with features and benchmarks
+- 📖 Getting Started guide
+- 📚 User guides (stream parallelism, fusion, memory management, AMP)
+- 🔧 Complete API reference
+- 📊 Performance benchmarks
+- 🤝 Contributing guidelines
+
+See [RUNNING_DOCS.md](RUNNING_DOCS.md) for more details.
+
+---
+
 ## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.

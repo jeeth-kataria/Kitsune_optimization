@@ -3,26 +3,30 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kitsune"
+name = "torch-kitsune"
 version = "0.1.0"
-description = "CUDA-accelerated dynamic task scheduler for PyTorch neural network training"
+description = "CUDA-accelerated dataflow optimizer for PyTorch with zero-copy pooling and kernel fusion"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Kitsune Team"}
+    {name = "Jeeth Kataria", email = "jeeth.kataria@example.com"}
 ]
 keywords = [
     "pytorch",
     "cuda",
-    "deep-learning",
-    "scheduler",
     "optimization",
+    "scheduler",
     "gpu",
+    "deep-learning",
+    "llm",
+    "fine-tuning",
+    "kernel-fusion",
+    "memory-pooling",
     "dataflow"
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
@@ -32,6 +36,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Distributed Computing",
+    "Environment :: GPU :: NVIDIA CUDA",
 ]
 
 dependencies = [
@@ -40,7 +46,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Triton is only available on Linux - optional for kernel fusion (Week 5)
+# Triton is only available on Linux - optional for kernel fusion
 triton = [
     "triton>=2.1.0; sys_platform == 'linux'",
 ]
@@ -51,19 +57,28 @@ dev = [
     "isort>=5.12.0",
     "mypy>=1.0.0",
     "ruff>=0.1.0",
+    "build>=1.0.0",
+    "twine>=4.0.0",
 ]
 viz = [
     "matplotlib>=3.5.0",
     "tensorboard>=2.10.0",
 ]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.4.0",
+    "mkdocstrings[python]>=0.24.0",
+    "mkdocs-git-revision-date-localized-plugin>=1.2.0",
+]
 all = [
-    "kitsune[dev,viz,triton]",
+    "torch-kitsune[dev,viz,triton,docs]",
 ]
 
 [project.urls]
-Homepage = "https://github.com/kitsune-scheduler/kitsune"
-Documentation = "https://github.com/kitsune-scheduler/kitsune#readme"
-Repository = "https://github.com/kitsune-scheduler/kitsune"
+Homepage = "https://github.com/jeeth-kataria/Kitsune_optimization"
+Documentation = "https://jeeth-kataria.github.io/Kitsune_optimization"
+Repository = "https://github.com/jeeth-kataria/Kitsune_optimization"
+"Bug Tracker" = "https://github.com/jeeth-kataria/Kitsune_optimization/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

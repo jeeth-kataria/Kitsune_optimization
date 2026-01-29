@@ -1,0 +1,104 @@
+name: Benchmark Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC
+    - cron: '0 0 * * 0'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    
+    # Only run on GPU-enabled runners (requires self-hosted or GPU runner)
+    # For GitHub-hosted runners, you'll need to use self-hosted with GPU
+    # Comment out this line if using self-hosted GPU runner
+    if: false  # Disable by default - enable when GPU runner is available
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    
+    - name: Install CUDA toolkit
+      uses: Jimver/cuda-toolkit@v0.2.14
+      with:
+        cuda: '11.8.0'
+    
+    - name: Verify CUDA installation
+      run: |
+        nvcc --version
+        nvidia-smi
+    
+    - name: Install PyTorch with CUDA
+      run: |
+        pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+    
+    - name: Install Kitsune
+      run: |
+        pip install -e .
+    
+    - name: Install benchmark dependencies
+      run: |
+        pip install matplotlib numpy
+    
+    - name: Run benchmark suite
+      run: |
+        cd benchmarks/scripts
+        chmod +x run_all_benchmarks.sh
+        ./run_all_benchmarks.sh --runs 3 --iterations 50
+    
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results
+        path: |
+          benchmarks/results/*.json
+          benchmarks/charts/*.png
+    
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          
+          // Read MLP results
+          const mlpResults = JSON.parse(fs.readFileSync('benchmarks/results/mlp_results.json', 'utf8'));
+          const lenetResults = JSON.parse(fs.readFileSync('benchmarks/results/lenet5_results.json', 'utf8'));
+          const resnetResults = JSON.parse(fs.readFileSync('benchmarks/results/resnet18_results.json', 'utf8'));
+          
+          const comment = `## 📊 Benchmark Results
+          
+          | Model | Baseline | Kitsune | Speedup | Memory Saved |
+          |-------|----------|---------|---------|--------------|
+          | MLP | ${mlpResults.baseline.mean_time_ms.toFixed(2)}ms | ${mlpResults.kitsune.mean_time_ms.toFixed(2)}ms | **${mlpResults.improvement.speedup.toFixed(2)}x** | ${mlpResults.improvement.memory_reduction_percent.toFixed(1)}% |
+          | LeNet-5 | ${lenetResults.baseline.mean_time_ms.toFixed(2)}ms | ${lenetResults.kitsune.mean_time_ms.toFixed(2)}ms | **${lenetResults.improvement.speedup.toFixed(2)}x** | ${lenetResults.improvement.memory_reduction_percent.toFixed(1)}% |
+          | ResNet-18 | ${resnetResults.baseline.mean_time_ms.toFixed(2)}ms | ${resnetResults.kitsune.mean_time_ms.toFixed(2)}ms | **${resnetResults.improvement.speedup.toFixed(2)}x** | ${resnetResults.improvement.memory_reduction_percent.toFixed(1)}% |
+          
+          **Hardware:** ${mlpResults.hardware.gpu}
+          **CUDA:** ${mlpResults.hardware.cuda_version}
+          **PyTorch:** ${mlpResults.hardware.pytorch_version}
+          **Kitsune:** ${mlpResults.hardware.kitsune_version}
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+    
+    - name: Update benchmark badge
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Badge update would go here - can use shields.io endpoint"
+        # Example: Update README with new benchmark numbers

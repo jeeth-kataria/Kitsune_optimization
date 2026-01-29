@@ -1,0 +1,2 @@
+# Placeholder for benchmark charts
+# Run: cd benchmarks/scripts && python3 visualize_results.py

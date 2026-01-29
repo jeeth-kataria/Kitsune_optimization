@@ -1,0 +1,132 @@
+/* Custom CSS for Kitsune documentation */
+
+/* Feature cards on homepage */
+.grid.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.grid.cards > * {
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.grid.cards > *:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Code block enhancements */
+.highlight {
+    border-radius: 0.5rem;
+}
+
+/* Performance metrics tables */
+table {
+    margin: 1.5rem 0;
+}
+
+table thead th {
+    background-color: var(--md-primary-fg-color);
+    color: white;
+    font-weight: 600;
+}
+
+table tbody tr:hover {
+    background-color: var(--md-default-fg-color--lightest);
+}
+
+/* Benchmark results highlighting */
+table tbody td:last-child {
+    font-weight: 600;
+}
+
+table tbody td:last-child::before {
+    content: '⚡ ';
+}
+
+/* Admonition custom styling */
+.admonition {
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+/* API reference styling */
+.doc-heading {
+    border-bottom: 2px solid var(--md-primary-fg-color);
+    padding-bottom: 0.5rem;
+    margin-top: 2rem;
+}
+
+/* Mermaid diagram styling */
+.mermaid {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+/* Navigation breadcrumbs */
+.md-nav__link--active {
+    font-weight: 600;
+    color: var(--md-primary-fg-color);
+}
+
+/* Footer customization */
+.md-footer {
+    margin-top: 3rem;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+    .grid.cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Code copy button */
+button[data-clipboard-target] {
+    background-color: var(--md-primary-fg-color);
+    opacity: 0.8;
+}
+
+button[data-clipboard-target]:hover {
+    opacity: 1;
+}
+
+/* Performance chart container */
+.performance-chart {
+    background: var(--md-code-bg-color);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+}
+
+/* Version badge */
+.version-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--md-primary-fg-color);
+    color: white;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Status indicators */
+.status-success {
+    color: #4caf50;
+    font-weight: 600;
+}
+
+.status-warning {
+    color: #ff9800;
+    font-weight: 600;
+}
+
+.status-error {
+    color: #f44336;
+    font-weight: 600;
+}

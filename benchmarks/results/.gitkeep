@@ -1,0 +1,2 @@
+# Placeholder for MLP benchmark results
+# Run: cd benchmarks/scripts && python3 benchmark_mlp.py
