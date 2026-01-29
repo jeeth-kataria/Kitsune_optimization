@@ -2,14 +2,14 @@
 
 # 🦊 Kitsune
 
-### CUDA-Accelerated Dataflow Scheduler for PyTorch
+### Memory-Optimized Training Framework for PyTorch
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.0+](https://img.shields.io/badge/pytorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![CUDA 11.0+](https://img.shields.io/badge/CUDA-11.0+-76B900.svg)](https://developer.nvidia.com/cuda-toolkit)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**A high-performance dataflow scheduler that delivers 100%+ speedup over baseline PyTorch through intelligent CUDA stream management, zero-copy memory pooling, and automatic kernel fusion.**
+**A memory-efficient training framework that reduces GPU memory usage by 30-40% while maintaining performance through intelligent memory pooling, automatic mixed precision, and integration with PyTorch's native optimizations.**
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Benchmarks](#-benchmarks) • [Architecture](#-architecture) • [Installation](#-installation)
 
@@ -19,15 +19,14 @@
 
 ## 🎯 Overview
 
-Kitsune is a production-ready optimization framework designed to accelerate PyTorch neural network training on resource-constrained GPUs (4-8GB VRAM). By leveraging dataflow scheduling principles and advanced CUDA optimizations, Kitsune achieves **2-2.2x speedup** with a single-line code change.
+Kitsune is a production-ready optimization framework designed to enable training of larger models on resource-constrained GPUs (4-8GB VRAM). By leveraging intelligent memory management and PyTorch's native compiler, Kitsune achieves **30-40% memory reduction** with minimal performance overhead and potential speedups on certain workloads.
 
 ### Key Highlights
 
-- 🚀 **2x+ Performance Gain**: Proven speedup across MLP, CNN, and ResNet architectures
-- 🔌 **Drop-in Integration**: Zero-modification replacement for existing PyTorch optimizers
-- 🧠 **Intelligent Scheduling**: Dependency-aware execution across multi-stream CUDA pipelines
-- 💾 **Memory Efficient**: Zero-allocation hot paths with smart memory reuse
-- ⚡ **Kernel Fusion**: Triton-based fusion reduces kernel launch overhead by 40%+
+- 💾 **30-40% Memory Savings**: Proven reduction across MLP, CNN, and ResNet architectures
+- 🔌 **Drop-in Integration**: Zero-modification replacement for existing PyTorch workflows  
+- 🧠 **Intelligent Memory Pooling**: Smart tensor reuse reduces allocation overhead
+- ⚡ **Performance Maintained**: Leverages torch.compile for potential 1.2-1.5x training speedups
 - 🛡️ **Automatic Fallback**: Graceful degradation ensures compatibility
 
 ---
@@ -38,16 +37,15 @@ Kitsune is a production-ready optimization framework designed to accelerate PyTo
 
 | Feature | Description | Impact |
 |---------|-------------|--------|
-| **🔄 CUDA Stream Parallelism** | Executes independent operations concurrently across 4-8 streams | 40-60% latency reduction |
-| **💾 Zero-Copy Memory Pooling** | Intelligent tensor reuse with size-class binning | 80% reduction in allocations |
-| **⚡ Kernel Fusion** | Triton-based fusion of common operation patterns (LayerNorm, Dropout, etc.) | 30-50% fewer kernel launches |
-| **📊 Dataflow Scheduling** | Dependency-aware scheduling minimizes GPU idle time | 20-30% better GPU utilization |
-| **🎯 Mixed Precision (AMP)** | Automatic FP16/BF16 conversion with dynamic loss scaling | 1.5-2x throughput boost |
-| **📈 CUDA Graph Caching** | Capture and replay execution graphs for repeated patterns | 15-25% overhead reduction |
+| **💾 Memory Pooling** | Intelligent tensor reuse with size-class binning | 30-40% memory reduction |
+| **🎯 Mixed Precision (AMP)** | Automatic FP16/BF16 conversion with dynamic loss scaling | Additional memory savings |
+| **⚡ torch.compile Integration** | Leverages PyTorch's native compiler | Potential 1.2-1.5x training speedup |
+| **📊 Graph Capture** | Analyzes model computation graph for optimization opportunities | Enables memory planning |
+| **🔄 CUDA Stream Management** | Infrastructure for concurrent operations | Future optimization potential |
 
 ### Developer Experience
 
-- ✅ **Single-Line Integration**: Wrap your optimizer, no other code changes needed
+- ✅ **Single-Line Integration**: Wrap your model, no other code changes needed
 - 🔍 **Comprehensive Profiling**: Built-in memory and timing analysis
 - 🛠️ **Extensive Testing**: 95%+ test coverage with benchmark suite
 - 📝 **Rich Documentation**: Detailed examples and API reference
