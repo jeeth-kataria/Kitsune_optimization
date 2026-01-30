@@ -505,6 +505,49 @@ Development timeline for the 8-week optimization competition:
 
 ---
 
+## 🔬 Future Testing & Optimization Plans
+
+### Planned Hardware Testing
+
+| Platform | Status | Target Speedup |
+|----------|--------|----------------|
+| ✅ Tesla T4 (Colab) | **Completed** | 4.06x achieved |
+| ✅ Apple M1 Pro | **Completed** | 45x achieved |
+| ⏳ NVIDIA RTX 3090 | Q1 2026 | 5-6x expected |
+| ⏳ NVIDIA RTX 4090 | Q1 2026 | 6-8x expected (FP8) |
+| ⏳ NVIDIA A100 | Q2 2026 | 8-10x expected |
+| ⏳ Apple M3 Max | Q1 2026 | 50x+ expected |
+| ⏳ AMD MI250X | Q2 2026 | TBD |
+
+### Optimization Roadmap
+
+**Q1 2026:**
+- [ ] INT8 quantization for T4/RTX (2x additional speedup)
+- [ ] CUDA graphs for repeated inference patterns
+- [ ] Flash Attention integration for transformers
+- [ ] Batch size auto-tuning
+
+**Q2 2026:**
+- [ ] Multi-GPU pipeline parallelism
+- [ ] Dynamic batching for production serving
+- [ ] TensorRT integration for NVIDIA GPUs
+- [ ] CoreML export for Apple devices
+
+**Q3 2026:**
+- [ ] AMD ROCm support
+- [ ] Intel oneAPI integration
+- [ ] Hugging Face Transformers native support
+- [ ] LLM-specific optimizations (KV cache, etc.)
+
+### Benchmarking Plans
+
+- **Models**: ResNet, EfficientNet, ViT, BERT, GPT-2, LLaMA
+- **Workloads**: Image classification, NLP, generative AI
+- **Metrics**: Latency (p50/p99), throughput, memory usage
+- **Environments**: Colab, AWS, GCP, local workstations
+
+---
+
 ## 🏢 Enterprise & Production Use
 
 Kitsune is designed for production deployment:
@@ -619,6 +662,7 @@ This project draws inspiration from cutting-edge research and industry practices
 ## 📞 Contact & Citation
 
 **Maintainer**: Jeeth Kataria  
+**Email**: jeethkataria9798@icloud.com  
 **Project Link**: [https://github.com/jeeth-kataria/Kitsune_optimization](https://github.com/jeeth-kataria/Kitsune_optimization)
 
 If you use Kitsune in your research or projects, please consider citing:

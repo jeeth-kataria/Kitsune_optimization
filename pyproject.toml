@@ -4,26 +4,34 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "torch-kitsune"
-version = "0.1.0"
-description = "CUDA-accelerated dataflow optimizer for PyTorch with zero-copy pooling and kernel fusion"
+version = "0.3.0"
+description = "High-performance PyTorch optimization framework: 4x speedup on T4, 45x on Apple Silicon via hardware-specific backends, JIT compilation, and intelligent memory management"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Jeeth Kataria", email = "jeeth.kataria@example.com"}
+    {name = "Jeeth Kataria", email = "jeethkataria9798@icloud.com"}
+]
+maintainers = [
+    {name = "Jeeth Kataria", email = "jeethkataria9798@icloud.com"}
 ]
 keywords = [
     "pytorch",
     "cuda",
     "optimization",
-    "scheduler",
+    "inference",
     "gpu",
     "deep-learning",
-    "llm",
-    "fine-tuning",
-    "kernel-fusion",
+    "apple-silicon",
+    "mps",
+    "t4",
+    "rtx",
+    "jit",
+    "torch-compile",
+    "fp16",
+    "mixed-precision",
     "memory-pooling",
-    "dataflow"
+    "performance"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -38,6 +46,8 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Distributed Computing",
     "Environment :: GPU :: NVIDIA CUDA",
+    "Environment :: MacOS X",
+    "Operating System :: OS Independent",
 ]
 
 dependencies = [
@@ -78,7 +88,9 @@ all = [
 Homepage = "https://github.com/jeeth-kataria/Kitsune_optimization"
 Documentation = "https://jeeth-kataria.github.io/Kitsune_optimization"
 Repository = "https://github.com/jeeth-kataria/Kitsune_optimization"
+Changelog = "https://github.com/jeeth-kataria/Kitsune_optimization/blob/main/CHANGELOG.md"
 "Bug Tracker" = "https://github.com/jeeth-kataria/Kitsune_optimization/issues"
+"Release Notes" = "https://github.com/jeeth-kataria/Kitsune_optimization/releases"
 
 [tool.setuptools.packages.find]
 where = ["."]
