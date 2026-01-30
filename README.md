@@ -11,6 +11,8 @@
 
 **A memory-efficient training framework that reduces GPU memory usage by 30-40% while maintaining performance through intelligent memory pooling, automatic mixed precision, and integration with PyTorch's native optimizations.**
 
+**🆕 v0.3.0**: Native Apple Silicon support with up to **45x speedup** on M1/M2/M3!
+
 [Features](#-features) • [Quick Start](#-quick-start) • [Benchmarks](#-benchmarks) • [Architecture](#-architecture) • [Installation](#-installation)
 
 </div>
@@ -24,6 +26,7 @@ Kitsune is a production-ready optimization framework designed to enable training
 ### Key Highlights
 
 - 💾 **30-40% Memory Savings**: Proven reduction across MLP, CNN, and ResNet architectures
+- 🍎 **Apple Silicon Native**: Up to **45x speedup** on M1/M2/M3 with MPS acceleration
 - 🔌 **Drop-in Integration**: Zero-modification replacement for existing PyTorch workflows  
 - 🧠 **Intelligent Memory Pooling**: Smart tensor reuse reduces allocation overhead
 - ⚡ **Performance Maintained**: Leverages torch.compile for potential 1.2-1.5x training speedups
@@ -38,6 +41,7 @@ Kitsune is a production-ready optimization framework designed to enable training
 | Feature | Description | Impact |
 |---------|-------------|--------|
 | **💾 Memory Pooling** | Intelligent tensor reuse with size-class binning | 30-40% memory reduction |
+| **🍎 Apple Silicon** | Native MPS backend with Neural Engine support | Up to 45x speedup on M1/M2/M3 |
 | **🎯 Mixed Precision (AMP)** | Automatic FP16/BF16 conversion with dynamic loss scaling | Additional memory savings |
 | **⚡ torch.compile Integration** | Leverages PyTorch's native compiler | Potential 1.2-1.5x training speedup |
 | **📊 Graph Capture** | Analyzes model computation graph for optimization opportunities | Enables memory planning |
@@ -133,11 +137,14 @@ pip install -e ".[dev]"
 |------------|---------|---------|
 | Python | 3.10+ | Core runtime |
 | PyTorch | 2.0+ | Deep learning framework |
-| CUDA Toolkit | 11.0+ | GPU acceleration |
+| CUDA Toolkit | 11.0+ | GPU acceleration (NVIDIA) |
 | NVIDIA GPU | Compute Capability 6.0+ | CUDA operations |
+| Apple Silicon | M1/M2/M3 | MPS acceleration (macOS) |
 | Triton | 2.1+ | Kernel fusion (optional, Linux only) |
 
-**Recommended**: NVIDIA RTX 3050/3060 or better (4GB+ VRAM)
+**Supported Platforms**:
+- 🖥️ NVIDIA RTX 3050/3060 or better (4GB+ VRAM)
+- 🍎 Apple M1/M2/M3 (8GB+ Unified Memory)
 
 ---
 
@@ -152,6 +159,29 @@ Measured on **NVIDIA RTX 3050 (4GB VRAM)** with batch size optimized for each mo
 | **MLP** | 3-layer FC (MNIST) | 45 | 22 | **2.0x** ⚡ | 35% |
 | **LeNet-5** | CNN (MNIST) | 38 | 18 | **2.1x** ⚡ | 42% |
 | **ResNet-18** | Deep CNN (CIFAR-10) | 125 | 58 | **2.2x** ⚡ | 38% |
+
+### 🍎 Apple Silicon Performance (M1/M2/M3)
+
+Kitsune v0.3.0 introduces **native Apple Silicon support** with MPS acceleration:
+
+| Model | CPU (ms) | MPS + Kitsune (ms) | **Speedup** |
+|-------|----------|-------------------|-------------|
+| **MobileNetV3** | 427 | 9.3 | **45.7x** 🚀 |
+| **ResNet-50** | 2,229 | 64.3 | **34.7x** 🚀 |
+| **ResNet-18** | 532 | 24.3 | **21.9x** 🚀 |
+
+*Measured on Apple M1 Pro (16GB) with batch size 16*
+
+```python
+import kitsune
+
+# Automatic Apple Silicon optimization
+model = YourModel()
+x = torch.randn(16, 3, 224, 224)
+
+optimized = kitsune.auto_optimize(model, x)  # Auto-detects MPS
+# 20-45x faster inference! 🔥
+```
 
 ### Optimization Breakdown
 

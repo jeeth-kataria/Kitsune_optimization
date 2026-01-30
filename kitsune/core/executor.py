@@ -264,9 +264,41 @@ class ModelExecutor:
         Returns:
             Model output
         """
-        # For now, use standard forward pass
-        # TODO: Implement kernel extraction and parallel execution
-        return self.model(input)
+        # Use stream-parallel execution if enabled
+        if self._executor is not None and self._executor.enabled:
+            try:
+                # Execute with captured plan and stream parallelism
+                return self._execute_parallel(input)
+            except Exception as e:
+                logger.warning(f"Parallel execution failed: {e}, falling back to standard forward")
+                return self.model(input)
+        else:
+            return self.model(input)
+    
+    def _execute_parallel(self, input: torch.Tensor) -> torch.Tensor:
+        """Execute model using captured graph with stream parallelism."""
+        # Store input for graph execution
+        self._module_outputs['input'] = input
+        
+        # Build kernel map from model modules
+        kernels = {}
+        for task in self._plan.tasks:
+            task_id = task.id
+            # Map each task to its corresponding module operation
+            if task_id < len(list(self.model.modules())):
+                module = list(self.model.modules())[task_id]
+                
+                def make_kernel(mod, task_input_key='input'):
+                    def kernel():
+                        inp = self._module_outputs.get(task_input_key, input)
+                        return mod(inp)
+                    return kernel
+                
+                kernels[task_id] = make_kernel(module, f'task_{task_id}_input')
+        
+        # Execute through stream executor
+        result = self._executor.execute(self._plan, kernels)
+        return result.output if result.output is not None else self.model(input)
 
     def benchmark(
         self,

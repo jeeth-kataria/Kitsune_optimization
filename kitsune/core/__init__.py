@@ -23,6 +23,7 @@ from .executor import (
     ParallelForwardExecutor,
     ExecutionResult,
 )
+from .optimized_wrapper import OptimizedModelWrapper, create_optimized_model
 
 __all__ = [
     # Task
@@ -45,4 +46,7 @@ __all__ = [
     "ModelExecutor",
     "ParallelForwardExecutor",
     "ExecutionResult",
+    # Optimized wrapper
+    "OptimizedModelWrapper",
+    "create_optimized_model",
 ]
