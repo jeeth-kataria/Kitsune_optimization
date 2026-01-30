@@ -95,8 +95,9 @@ print("\n🎯 Test 2: JIT Trace + Freeze")
 model_jit = models.resnet50(weights=None).to(device).eval()
 with torch.no_grad():
     traced = torch.jit.trace(model_jit, x)
-    traced = torch.jit.optimize_for_inference(traced)
+    # freeze first, then optimize_for_inference
     traced = torch.jit.freeze(traced)
+    traced = torch.jit.optimize_for_inference(traced)
 jit_time = benchmark(traced, x, "JIT")
 results["2. JIT Trace"] = jit_time
 print(f"   Result: {jit_time:.2f} ms ({baseline/jit_time:.2f}x)")
@@ -106,13 +107,12 @@ torch.cuda.empty_cache()
 
 # 3. FP16 AMP
 print("\n🎯 Test 3: FP16 Mixed Precision")
-from torch.cuda.amp import autocast
 model_amp = models.resnet50(weights=None).to(device).eval()
 
 times = []
 with torch.no_grad():
     for _ in range(20):  # warmup
-        with autocast(dtype=torch.float16):
+        with torch.amp.autocast('cuda', dtype=torch.float16):
             _ = model_amp(x)
     torch.cuda.synchronize()
     
@@ -120,7 +120,7 @@ with torch.no_grad():
         start = torch.cuda.Event(enable_timing=True)
         end = torch.cuda.Event(enable_timing=True)
         start.record()
-        with autocast(dtype=torch.float16):
+        with torch.amp.autocast('cuda', dtype=torch.float16):
             _ = model_amp(x)
         end.record()
         torch.cuda.synchronize()
@@ -140,8 +140,8 @@ x_half = x.half()
 
 with torch.no_grad():
     traced_half = torch.jit.trace(model_combined, x_half)
-    traced_half = torch.jit.optimize_for_inference(traced_half)
     traced_half = torch.jit.freeze(traced_half)
+    traced_half = torch.jit.optimize_for_inference(traced_half)
 
 jit_fp16_time = benchmark(traced_half, x_half, "JIT+FP16")
 results["4. JIT + FP16"] = jit_fp16_time

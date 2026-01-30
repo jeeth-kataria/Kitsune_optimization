@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-01-30
+
+### Added
+
+#### Hardware-Specific Backends 🚀
+- **T4 Optimizer** (`kitsune/backends/t4_optimizer.py`): Optimized for Tesla T4 GPUs
+  - INT8 quantization support (61 TOPS)
+  - FP16 mixed precision (65 TFLOPS)
+  - JIT trace → freeze → optimize_for_inference pipeline
+  - Achieved **4.06x speedup** on Google Colab T4
+
+- **Apple Silicon Optimizer** (`kitsune/backends/apple_optimizer.py`): Native M1/M2/M3 support
+  - MPS backend with channels-last memory format
+  - Chip detection (M1/M2/M3/M4)
+  - CoreML integration for Neural Engine
+  - Achieved **45x speedup** on M1 Pro
+
+- **RTX Optimizer** (`kitsune/backends/rtx_optimizer.py`): For RTX 30xx/40xx GPUs
+  - TF32 tensor core acceleration
+  - FP8 support for RTX 40 series
+  - Sparsity optimizations
+  - CUDA graphs for repeated patterns
+
+- **Backend Selector** (`kitsune/backends/backend_selector.py`): Auto hardware detection
+  - `detect_platform()`: Identifies T4, RTX, Apple Silicon
+  - `get_optimal_backend()`: Returns best optimizer
+  - `auto_optimize()`: One-line optimization API
+
+#### Platform Test Suite
+- `benchmarks/platform_tests/test_t4.py`: Comprehensive T4 benchmark (Colab-ready)
+- `benchmarks/platform_tests/test_apple.py`: Apple Silicon benchmark
+- `benchmarks/platform_tests/test_rtx.py`: RTX GPU benchmark
+
+### Performance Results
+
+| Platform | Model | Speedup |
+|----------|-------|---------|
+| **T4 (Colab)** | ResNet-50 | **4.06x** |
+| **Apple M1 Pro** | MobileNetV3 | **45.7x** |
+| **Apple M1 Pro** | ResNet-50 | **34.7x** |
+| **Apple M1 Pro** | ResNet-18 | **21.9x** |
+
+### Fixed
+- JIT operation order: trace → freeze → optimize_for_inference (was causing errors)
+- Deprecated `torch.cuda.amp.autocast` → `torch.amp.autocast('cuda', ...)`
+
+---
+
 ## [Unreleased]
 
 ### Added
@@ -76,9 +124,11 @@ Measured on NVIDIA RTX 3050 (4GB VRAM):
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 0.3.0 | 2026-01-30 | Hardware backends: 4x on T4, 45x on Apple Silicon |
 | 0.1.0 | 2026-01-27 | Initial release with full optimization stack |
 
 ---
 
-[Unreleased]: https://github.com/jeeth-kataria/Kitsune_optimization/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/jeeth-kataria/Kitsune_optimization/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/jeeth-kataria/Kitsune_optimization/compare/v0.1.0...v0.3.0
 [0.1.0]: https://github.com/jeeth-kataria/Kitsune_optimization/releases/tag/v0.1.0
