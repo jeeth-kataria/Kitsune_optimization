@@ -8,16 +8,17 @@ optional Triton support on Linux.
 from __future__ import annotations
 
 import sys
-from typing import Optional, Dict, Any, Callable, List, Tuple
 from dataclasses import dataclass, field
 from functools import lru_cache
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import torch
 import torch.nn as nn
 
-from .patterns import FusionPattern, FusionType
-from .detector import FusionCandidate, FusionDetector
 from ..core.graph import ComputationGraph
 from ..profiler import get_logger
+from .detector import FusionCandidate, FusionDetector
+from .patterns import FusionPattern, FusionType
 
 logger = get_logger(__name__)
 
@@ -27,6 +28,7 @@ try:
     if sys.platform != "win32":
         import triton
         import triton.language as tl
+
         TRITON_AVAILABLE = True
         logger.info("Triton available for kernel fusion")
 except ImportError:
@@ -35,10 +37,10 @@ except ImportError:
 # Check if torch.compile is available (requires PyTorch 2.0+ on Linux)
 TORCH_COMPILE_AVAILABLE = False
 try:
-    if hasattr(torch, 'compile'):
+    if hasattr(torch, "compile"):
         # Test if it actually works
         _test_fn = lambda x: x + 1
-        torch.compile(_test_fn, backend='eager')
+        torch.compile(_test_fn, backend="eager")
         TORCH_COMPILE_AVAILABLE = True
         logger.info("torch.compile available")
 except Exception:
@@ -57,6 +59,7 @@ class FusedKernel:
         input_specs: Input tensor specifications
         backend: Compilation backend used
     """
+
     name: str
     pattern: FusionPattern
     compiled_fn: Callable
@@ -181,25 +184,31 @@ class FusedOperations:
     @staticmethod
     def linear_relu(weight: torch.Tensor, bias: Optional[torch.Tensor] = None) -> Callable:
         """Create fused linear + ReLU."""
+
         def fused(x: torch.Tensor) -> torch.Tensor:
             out = torch.nn.functional.linear(x, weight, bias)
             return torch.nn.functional.relu(out)
+
         return fused
 
     @staticmethod
     def linear_gelu(weight: torch.Tensor, bias: Optional[torch.Tensor] = None) -> Callable:
         """Create fused linear + GELU."""
+
         def fused(x: torch.Tensor) -> torch.Tensor:
             out = torch.nn.functional.linear(x, weight, bias)
             return torch.nn.functional.gelu(out)
+
         return fused
 
     @staticmethod
     def linear_silu(weight: torch.Tensor, bias: Optional[torch.Tensor] = None) -> Callable:
         """Create fused linear + SiLU."""
+
         def fused(x: torch.Tensor) -> torch.Tensor:
             out = torch.nn.functional.linear(x, weight, bias)
             return torch.nn.functional.silu(out)
+
         return fused
 
     @staticmethod
@@ -219,15 +228,19 @@ class FusedOperations:
     @staticmethod
     def add_relu() -> Callable:
         """Create fused add + ReLU."""
+
         def fused(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
             return torch.nn.functional.relu(x + y)
+
         return fused
 
     @staticmethod
     def mul_add(scale: float, bias: float) -> Callable:
         """Create fused multiply + add."""
+
         def fused(x: torch.Tensor) -> torch.Tensor:
             return x * scale + bias
+
         return fused
 
 
@@ -334,6 +347,7 @@ class FusionEngine:
         """
         if not inplace:
             import copy
+
             model = copy.deepcopy(model)
 
         # Apply torch.compile for automatic fusion

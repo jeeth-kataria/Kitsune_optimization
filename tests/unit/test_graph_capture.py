@@ -6,14 +6,14 @@ import pytest
 import torch
 import torch.nn as nn
 
+from kitsune.core.graph import ComputationGraph
 from kitsune.pytorch.graph_capture import (
-    GraphCapture,
     FXGraphCapture,
-    HookGraphCapture,
+    GraphCapture,
     GraphCaptureError,
+    HookGraphCapture,
     capture_graph,
 )
-from kitsune.core.graph import ComputationGraph
 
 
 class SimpleModel(nn.Module):

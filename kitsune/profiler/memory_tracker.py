@@ -191,14 +191,20 @@ class MemoryTracker:
         # Reset peak stats for accurate peak measurement
         self.reset_peak_stats()
 
-        start_allocated = torch.cuda.memory_allocated(self.device) if torch.cuda.is_available() else 0
+        start_allocated = (
+            torch.cuda.memory_allocated(self.device) if torch.cuda.is_available() else 0
+        )
         self._tracking_stack.append((name, start_allocated, 0))
 
         try:
             yield
         finally:
-            end_allocated = torch.cuda.memory_allocated(self.device) if torch.cuda.is_available() else 0
-            peak_allocated = torch.cuda.max_memory_allocated(self.device) if torch.cuda.is_available() else 0
+            end_allocated = (
+                torch.cuda.memory_allocated(self.device) if torch.cuda.is_available() else 0
+            )
+            peak_allocated = (
+                torch.cuda.max_memory_allocated(self.device) if torch.cuda.is_available() else 0
+            )
 
             name, start_allocated, _ = self._tracking_stack.pop()
 
@@ -308,7 +314,5 @@ def get_gpu_memory_info(device: int = 0) -> dict:
         "reserved_mb": torch.cuda.memory_reserved(device) / (1024**2),
         "max_allocated_mb": torch.cuda.max_memory_allocated(device) / (1024**2),
         "max_reserved_mb": torch.cuda.max_memory_reserved(device) / (1024**2),
-        "utilization_pct": (
-            torch.cuda.memory_allocated(device) / props.total_memory * 100
-        ),
+        "utilization_pct": (torch.cuda.memory_allocated(device) / props.total_memory * 100),
     }

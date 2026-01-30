@@ -8,17 +8,18 @@ the dependency graph and execution plan from the scheduler.
 from __future__ import annotations
 
 import time
-from typing import Optional, List, Dict, Any, Callable, Tuple
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import torch
 import torch.nn as nn
 
-from .graph import ComputationGraph
-from .task import Task, TaskStatus
-from .scheduler import ExecutionPlan, ScheduleStep, DataflowScheduler
-from ..cuda.stream_pool import StreamPool, get_stream_pool
 from ..cuda.events import DependencyTracker
-from ..profiler import get_logger, CUDATimer
+from ..cuda.stream_pool import StreamPool, get_stream_pool
+from ..profiler import CUDATimer, get_logger
+from .graph import ComputationGraph
+from .scheduler import DataflowScheduler, ExecutionPlan, ScheduleStep
+from .task import Task, TaskStatus
 
 logger = get_logger(__name__)
 
@@ -26,6 +27,7 @@ logger = get_logger(__name__)
 @dataclass
 class ExecutionResult:
     """Result of executing a computation graph."""
+
     output: Any = None
     total_time_ms: float = 0.0
     stream_times: Dict[int, float] = field(default_factory=dict)
@@ -250,8 +252,7 @@ class ModelExecutor:
         self._module_outputs: Dict[str, torch.Tensor] = {}
 
         logger.info(
-            f"ModelExecutor initialized: {len(self._plan)} tasks, "
-            f"{num_streams} streams"
+            f"ModelExecutor initialized: {len(self._plan)} tasks, " f"{num_streams} streams"
         )
 
     def __call__(self, input: torch.Tensor) -> torch.Tensor:
@@ -274,12 +275,12 @@ class ModelExecutor:
                 return self.model(input)
         else:
             return self.model(input)
-    
+
     def _execute_parallel(self, input: torch.Tensor) -> torch.Tensor:
         """Execute model using captured graph with stream parallelism."""
         # Store input for graph execution
-        self._module_outputs['input'] = input
-        
+        self._module_outputs["input"] = input
+
         # Build kernel map from model modules
         kernels = {}
         for task in self._plan.tasks:
@@ -287,15 +288,16 @@ class ModelExecutor:
             # Map each task to its corresponding module operation
             if task_id < len(list(self.model.modules())):
                 module = list(self.model.modules())[task_id]
-                
-                def make_kernel(mod, task_input_key='input'):
+
+                def make_kernel(mod, task_input_key="input"):
                     def kernel():
                         inp = self._module_outputs.get(task_input_key, input)
                         return mod(inp)
+
                     return kernel
-                
-                kernels[task_id] = make_kernel(module, f'task_{task_id}_input')
-        
+
+                kernels[task_id] = make_kernel(module, f"task_{task_id}_input")
+
         # Execute through stream executor
         result = self._executor.execute(self._plan, kernels)
         return result.output if result.output is not None else self.model(input)
@@ -439,10 +441,12 @@ class ParallelForwardExecutor:
         Returns:
             List of outputs from each branch
         """
+
         def make_branch_fn(branch: nn.Module) -> Callable[[], torch.Tensor]:
             def fn() -> torch.Tensor:
                 with torch.no_grad():
                     return branch(input)
+
             return fn
 
         functions = [make_branch_fn(b) for b in branches]

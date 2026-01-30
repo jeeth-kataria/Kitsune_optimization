@@ -23,7 +23,7 @@ Simple API:
 
 With Configuration:
     >>> from kitsune import OptimizationConfig, KitsuneOptimizer
-    >>> 
+    >>>
     >>> config = OptimizationConfig(strategy='compile', compile_mode='max-autotune')
     >>> optimizer = KitsuneOptimizer(model, sample, config)
     >>> output = optimizer(input_data)
@@ -38,124 +38,101 @@ Hardware Detection:
 __version__ = "0.3.0"  # Device-aware optimization release
 __author__ = "Kitsune Team"
 
+# Device-Aware Configuration (NEW)
+from .api.device_config import (
+    AmpereConfig,
+    CPUConfig,
+    DeviceType,
+    GenericCUDAConfig,
+    HardwareInfo,
+    HopperConfig,
+    T4Config,
+    apply_hardware_optimizations,
+    detect_hardware,
+    get_optimal_config,
+    print_hardware_info,
+    show_performance_guide,
+)
+
 # Primary API (v2 - tested and working)
 from .api.optimizer_v2 import (
-    optimize_model,
-    optimize,
-    get_optimizer,
     KitsuneOptimizer,
     OptimizationConfig,
     benchmark_optimization,
+    get_optimizer,
+    optimize,
+    optimize_model,
     print_benchmark,
-)
-
-# Device-Aware Configuration (NEW)
-from .api.device_config import (
-    detect_hardware,
-    get_optimal_config,
-    apply_hardware_optimizations,
-    print_hardware_info,
-    show_performance_guide,
-    HardwareInfo,
-    DeviceType,
-    T4Config,
-    AmpereConfig,
-    HopperConfig,
-    CPUConfig,
-    GenericCUDAConfig,
 )
 
 # Simple API (Legacy - kept for compatibility)
 try:
-    from .api.simple_optimizer import (
-        KitsuneConfig,
-        OptimizationMode,
-    )
+    from .api.simple_optimizer import KitsuneConfig, OptimizationMode
 except ImportError:
     pass
 
-# Profiler (Week 1)
-from .profiler import CUDATimer, MemoryTracker, Profiler, get_logger
+# AMP (Week 6)
+from .amp import AMPConfig, AMPOptimizer, KitsuneGradScaler, PrecisionMode, autocast_context
+
+# API (Week 4 MVP)
+from .api import KitsuneOptimizer, OptimizationConfig, OptimizationStats, optimize_model
 
 # Core (Week 2)
 from .core import (
-    Task,
-    TaskType,
-    TaskStatus,
-    TaskCost,
     ComputationGraph,
     DataflowScheduler,
     ExecutionPlan,
+    Task,
+    TaskCost,
+    TaskStatus,
+    TaskType,
 )
 
 # CUDA (Week 3)
-from .cuda import (
-    StreamPool,
-    CUDAStream,
-    EventManager,
-    CUDAGraphCapture,
-    get_stream_pool,
+from .cuda import CUDAGraphCapture, CUDAStream, EventManager, StreamPool, get_stream_pool
+
+# Fusion (Week 5)
+from .fusion import (
+    TRITON_AVAILABLE,
+    FusedOperations,
+    FusionDetector,
+    FusionEngine,
+    get_fusion_engine,
 )
 
 # Memory (Week 4)
 from .memory import (
+    CUDAPrefetcher,
+    DoubleBuffer,
+    LifetimeAnalyzer,
     MemoryPool,
     TensorCache,
-    DoubleBuffer,
-    CUDAPrefetcher,
-    LifetimeAnalyzer,
-    get_memory_pool,
     create_prefetched_loader,
+    get_memory_pool,
 )
 
-# API (Week 4 MVP)
-from .api import (
-    KitsuneOptimizer,
-    OptimizationConfig,
-    OptimizationStats,
-    optimize_model,
-)
-
-# Fusion (Week 5)
-from .fusion import (
-    FusionEngine,
-    FusionDetector,
-    FusedOperations,
-    TRITON_AVAILABLE,
-    get_fusion_engine,
-)
-
-# AMP (Week 6)
-from .amp import (
-    AMPConfig,
-    PrecisionMode,
-    KitsuneGradScaler,
-    AMPOptimizer,
-    autocast_context,
-)
+# Profiler (Week 1)
+from .profiler import CUDATimer, MemoryTracker, Profiler, get_logger
 
 # PyTorch integration
-from .pytorch import capture_graph, GraphCapture
+from .pytorch import GraphCapture, capture_graph
 
 # Hardware-Specific Backends (NEW in v0.3.0)
 try:
-    from .backends import (
-        # Backend selector
-        detect_platform,
-        get_optimal_backend,
-        PlatformType,
-        # T4/Turing optimizer
-        T4Optimizer,
-        T4QuantizationOptimizer,
-        T4MixedPrecisionOptimizer,
-        T4JITFusionOptimizer,
-        # Apple Silicon optimizer
-        AppleSiliconOptimizer,
+    from .backends import (  # Backend selector; T4/Turing optimizer; Apple Silicon optimizer; RTX optimizer
         AppleMPSOptimizer,
-        # RTX optimizer
+        AppleSiliconOptimizer,
+        PlatformType,
         RTXOptimizer,
         RTXTF32Optimizer,
+        T4JITFusionOptimizer,
+        T4MixedPrecisionOptimizer,
+        T4Optimizer,
+        T4QuantizationOptimizer,
+        detect_platform,
+        get_optimal_backend,
     )
+
     BACKENDS_AVAILABLE = True
 except ImportError:
     BACKENDS_AVAILABLE = False
@@ -166,31 +143,33 @@ except ImportError:
     AppleSiliconOptimizer = None
     RTXOptimizer = None
 
+
 # Convenience function for auto-optimization
 def auto_optimize(model, sample_input, level="balanced"):
     """
     Automatically detect hardware and apply optimal optimizations.
-    
+
     This is the recommended entry point for most users.
-    
+
     Args:
         model: PyTorch model to optimize
         sample_input: Example input tensor
         level: Optimization level ("conservative", "balanced", "aggressive")
-        
+
     Returns:
         Optimized model on the appropriate device
-    
+
     Example:
         >>> import kitsune
         >>> import torchvision.models as models
-        >>> 
+        >>>
         >>> model = models.resnet50()
         >>> x = torch.randn(1, 3, 224, 224)
         >>> optimized = kitsune.auto_optimize(model, x)
     """
     if BACKENDS_AVAILABLE and detect_platform is not None:
         from .backends.backend_selector import auto_optimize as _auto_optimize
+
         return _auto_optimize(model, sample_input, level)
     else:
         # Fallback to basic optimize
@@ -214,21 +193,25 @@ def get_device_info() -> dict:
     }
 
     if torch.cuda.is_available():
-        info.update({
-            "cuda_version": torch.version.cuda,
-            "device_count": torch.cuda.device_count(),
-            "devices": [],
-        })
+        info.update(
+            {
+                "cuda_version": torch.version.cuda,
+                "device_count": torch.cuda.device_count(),
+                "devices": [],
+            }
+        )
 
         for i in range(torch.cuda.device_count()):
             props = torch.cuda.get_device_properties(i)
-            info["devices"].append({
-                "index": i,
-                "name": props.name,
-                "total_memory_gb": props.total_memory / (1024**3),
-                "compute_capability": f"{props.major}.{props.minor}",
-                "multi_processor_count": props.multi_processor_count,
-            })
+            info["devices"].append(
+                {
+                    "index": i,
+                    "name": props.name,
+                    "total_memory_gb": props.total_memory / (1024**3),
+                    "compute_capability": f"{props.major}.{props.minor}",
+                    "multi_processor_count": props.multi_processor_count,
+                }
+            )
 
     return info
 

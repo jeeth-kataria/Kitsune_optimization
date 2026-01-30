@@ -38,11 +38,13 @@ class MLP(nn.Module):
         prev_size = input_size
 
         for hidden_size in hidden_sizes:
-            layers.extend([
-                nn.Linear(prev_size, hidden_size),
-                nn.ReLU(),
-                nn.Dropout(dropout),
-            ])
+            layers.extend(
+                [
+                    nn.Linear(prev_size, hidden_size),
+                    nn.ReLU(),
+                    nn.Dropout(dropout),
+                ]
+            )
             prev_size = hidden_size
 
         layers.append(nn.Linear(prev_size, output_size))
@@ -88,7 +90,7 @@ class LeNet(nn.Module):
         # Calculate flattened size
         # After conv1+pool: (input_size/2)
         # After conv2+pool: ((input_size/2 - 4) / 2)
-        conv_out_size = ((input_size // 2 - 4) // 2)
+        conv_out_size = (input_size // 2 - 4) // 2
         self.flat_size = 16 * conv_out_size * conv_out_size
 
         # Classifier
@@ -127,14 +129,12 @@ class BasicBlock(nn.Module):
         super().__init__()
 
         self.conv1 = nn.Conv2d(
-            in_channels, out_channels, kernel_size=3,
-            stride=stride, padding=1, bias=False
+            in_channels, out_channels, kernel_size=3, stride=stride, padding=1, bias=False
         )
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.relu = nn.ReLU(inplace=True)
         self.conv2 = nn.Conv2d(
-            out_channels, out_channels, kernel_size=3,
-            stride=1, padding=1, bias=False
+            out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=False
         )
         self.bn2 = nn.BatchNorm2d(out_channels)
         self.downsample = downsample
@@ -186,16 +186,10 @@ class ResNet18(nn.Module):
 
         # Initial convolution - smaller for CIFAR-10
         if small_input:
-            self.conv1 = nn.Conv2d(
-                in_channels, 64, kernel_size=3,
-                stride=1, padding=1, bias=False
-            )
+            self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=3, stride=1, padding=1, bias=False)
             self.maxpool = nn.Identity()
         else:
-            self.conv1 = nn.Conv2d(
-                in_channels, 64, kernel_size=7,
-                stride=2, padding=3, bias=False
-            )
+            self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3, bias=False)
             self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.bn1 = nn.BatchNorm2d(64)
@@ -225,15 +219,12 @@ class ResNet18(nn.Module):
         if stride != 1 or self.in_channels_current != out_channels:
             downsample = nn.Sequential(
                 nn.Conv2d(
-                    self.in_channels_current, out_channels,
-                    kernel_size=1, stride=stride, bias=False
+                    self.in_channels_current, out_channels, kernel_size=1, stride=stride, bias=False
                 ),
                 nn.BatchNorm2d(out_channels),
             )
 
-        layers = [
-            BasicBlock(self.in_channels_current, out_channels, stride, downsample)
-        ]
+        layers = [BasicBlock(self.in_channels_current, out_channels, stride, downsample)]
         self.in_channels_current = out_channels
 
         for _ in range(1, num_blocks):
@@ -244,7 +235,7 @@ class ResNet18(nn.Module):
     def _initialize_weights(self):
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.BatchNorm2d):
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)

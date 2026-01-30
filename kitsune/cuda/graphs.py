@@ -9,9 +9,10 @@ small kernels where launch overhead dominates.
 from __future__ import annotations
 
 import threading
-from typing import Optional, List, Callable, Any, Dict
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
+
 import torch
 
 from ..profiler import get_logger
@@ -22,6 +23,7 @@ logger = get_logger(__name__)
 @dataclass
 class CaptureStats:
     """Statistics about a captured CUDA graph."""
+
     name: str
     num_nodes: int = 0
     capture_time_ms: float = 0.0

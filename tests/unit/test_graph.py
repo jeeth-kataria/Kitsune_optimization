@@ -5,7 +5,7 @@ Unit tests for the computation graph module.
 import pytest
 
 from kitsune.core.graph import ComputationGraph, CycleDetectedError
-from kitsune.core.task import Task, TaskType, TaskStatus
+from kitsune.core.task import Task, TaskStatus, TaskType
 
 
 class TestComputationGraph:

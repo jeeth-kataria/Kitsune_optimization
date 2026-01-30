@@ -9,17 +9,17 @@ Supports multiple capture strategies:
 from __future__ import annotations
 
 import warnings
+import weakref
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
-from contextlib import contextmanager
-import weakref
 
 import torch
 import torch.nn as nn
-from torch.fx import symbolic_trace, Graph, GraphModule, Node
+from torch.fx import Graph, GraphModule, Node, symbolic_trace
 
 from ..core.graph import ComputationGraph
-from ..core.task import Task, TaskType, TaskCost
+from ..core.task import Task, TaskCost, TaskType
 from ..utils.logging import get_logger
 
 logger = get_logger("graph_capture")
@@ -27,12 +27,14 @@ logger = get_logger("graph_capture")
 
 class GraphCaptureError(Exception):
     """Error during graph capture."""
+
     pass
 
 
 @dataclass
 class CapturedOp:
     """Represents a captured operation during tracing."""
+
     name: str
     op_type: str
     target: Any
@@ -123,7 +125,9 @@ class FXGraphCapture:
                 # Function call (torch.relu, torch.add, etc.)
                 op_name = self._get_op_name(node.target)
                 input_ids = self._get_input_task_ids(node, node_to_task)
-                input_shapes = [shape_info.get(arg.name, ()) for arg in node.args if isinstance(arg, Node)]
+                input_shapes = [
+                    shape_info.get(arg.name, ()) for arg in node.args if isinstance(arg, Node)
+                ]
 
                 task = graph.add_task(
                     name=node.name,
@@ -138,7 +142,9 @@ class FXGraphCapture:
             elif node.op == "call_method":
                 # Method call (tensor.view, tensor.reshape, etc.)
                 input_ids = self._get_input_task_ids(node, node_to_task)
-                input_shapes = [shape_info.get(arg.name, ()) for arg in node.args if isinstance(arg, Node)]
+                input_shapes = [
+                    shape_info.get(arg.name, ()) for arg in node.args if isinstance(arg, Node)
+                ]
 
                 task = graph.add_task(
                     name=node.name,
@@ -155,7 +161,9 @@ class FXGraphCapture:
                 module = traced.get_submodule(node.target)
                 op_name = type(module).__name__.lower()
                 input_ids = self._get_input_task_ids(node, node_to_task)
-                input_shapes = [shape_info.get(arg.name, ()) for arg in node.args if isinstance(arg, Node)]
+                input_shapes = [
+                    shape_info.get(arg.name, ()) for arg in node.args if isinstance(arg, Node)
+                ]
 
                 task = graph.add_task(
                     name=node.name,
@@ -175,7 +183,15 @@ class FXGraphCapture:
                     op_type="output",
                     task_type=TaskType.TRANSFER_D2H,
                     inputs=input_ids,
-                    input_shapes=[shape_info.get(arg.name, ()) for arg in node.args[0] if isinstance(arg, Node)] if isinstance(node.args[0], (list, tuple)) else [],
+                    input_shapes=(
+                        [
+                            shape_info.get(arg.name, ())
+                            for arg in node.args[0]
+                            if isinstance(arg, Node)
+                        ]
+                        if isinstance(node.args[0], (list, tuple))
+                        else []
+                    ),
                     output_shapes=[],
                 )
                 node_to_task[node] = task.id
@@ -308,13 +324,12 @@ class HookGraphCapture:
         """Register forward hooks on all modules."""
         for name, module in model.named_modules():
             if len(list(module.children())) == 0:  # Leaf modules only
-                handle = module.register_forward_hook(
-                    self._make_forward_hook(name, module)
-                )
+                handle = module.register_forward_hook(self._make_forward_hook(name, module))
                 self._hooks.append(handle)
 
     def _make_forward_hook(self, module_name: str, module: nn.Module) -> Callable:
         """Create a forward hook for a module."""
+
         def hook(mod, inputs, output):
             # Get input shapes
             input_shapes = []

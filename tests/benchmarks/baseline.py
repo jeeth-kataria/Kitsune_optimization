@@ -216,9 +216,7 @@ def run_baseline_benchmark(
             # Record times (skip warmup)
             if not is_warmup:
                 total_time = (
-                    fwd_result.cuda_time_ms +
-                    bwd_result.cuda_time_ms +
-                    opt_result.cuda_time_ms
+                    fwd_result.cuda_time_ms + bwd_result.cuda_time_ms + opt_result.cuda_time_ms
                 )
                 iteration_times.append(total_time)
                 forward_times.append(fwd_result.cuda_time_ms)
@@ -306,7 +304,7 @@ def run_inference_benchmark(
             start_idx = (i * config.batch_size) % len(X)
             end_idx = start_idx + config.batch_size
             if end_idx > len(X):
-                batch_x = X[:config.batch_size]
+                batch_x = X[: config.batch_size]
             else:
                 batch_x = X[start_idx:end_idx]
 

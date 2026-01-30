@@ -6,16 +6,17 @@ Builds and manages the dependency graph for scheduling decisions.
 
 from __future__ import annotations
 
+import heapq
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from typing import Dict, List, Set, Optional, Iterator, Tuple
-import heapq
+from typing import Dict, Iterator, List, Optional, Set, Tuple
 
-from .task import Task, TaskStatus, TaskType, TaskCost
+from .task import Task, TaskCost, TaskStatus, TaskType
 
 
 class CycleDetectedError(Exception):
     """Raised when a cycle is detected in the task graph."""
+
     pass
 
 
@@ -97,8 +98,7 @@ class ComputationGraph:
 
         # Check if task is immediately ready
         if not inputs or all(
-            self._tasks.get(dep_id, Task(0, "", "")).is_completed
-            for dep_id in inputs
+            self._tasks.get(dep_id, Task(0, "", "")).is_completed for dep_id in inputs
         ):
             self._ready_tasks.add(task_id)
             task.mark_ready()

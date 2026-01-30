@@ -7,29 +7,29 @@ Contains CUDA-specific optimizations:
 - CUDA Graph capture and replay
 """
 
-from .stream_pool import (
-    CUDAStream,
-    StreamPool,
-    StreamStats,
-    StreamScheduler,
-    get_stream_pool,
-    reset_stream_pool,
-)
 from .events import (
-    EventManager,
-    EventTiming,
     DependencyTracker,
     EventBarrier,
+    EventManager,
+    EventTiming,
     get_event_manager,
     reset_event_manager,
 )
 from .graphs import (
-    CUDAGraphCapture,
     CaptureStats,
+    CUDAGraphCapture,
     GraphPool,
     StaticGraphExecutor,
     get_graph_pool,
     reset_graph_pool,
+)
+from .stream_pool import (
+    CUDAStream,
+    StreamPool,
+    StreamScheduler,
+    StreamStats,
+    get_stream_pool,
+    reset_stream_pool,
 )
 
 __all__ = [

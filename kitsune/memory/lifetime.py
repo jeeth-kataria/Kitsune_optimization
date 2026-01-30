@@ -7,30 +7,33 @@ more aggressive memory reuse and reduce peak memory.
 
 from __future__ import annotations
 
-from typing import Optional, List, Dict, Set, Tuple, Any
 from dataclasses import dataclass, field
 from enum import Enum, auto
+from typing import Any, Dict, List, Optional, Set, Tuple
+
 import torch
 
-from ..profiler import get_logger
 from ..core.graph import ComputationGraph
 from ..core.task import Task
+from ..profiler import get_logger
 
 logger = get_logger(__name__)
 
 
 class TensorLifeEvent(Enum):
     """Events in a tensor's lifetime."""
-    CREATE = auto()     # Tensor created
-    READ = auto()       # Tensor read (input to op)
-    WRITE = auto()      # Tensor written (output of op)
-    LAST_USE = auto()   # Last use of tensor
-    FREE = auto()       # Tensor can be freed
+
+    CREATE = auto()  # Tensor created
+    READ = auto()  # Tensor read (input to op)
+    WRITE = auto()  # Tensor written (output of op)
+    LAST_USE = auto()  # Last use of tensor
+    FREE = auto()  # Tensor can be freed
 
 
 @dataclass
 class TensorLifetime:
     """Lifetime information for a single tensor."""
+
     tensor_id: int
     name: str = ""
     size_bytes: int = 0
@@ -38,12 +41,12 @@ class TensorLifetime:
     shape: Tuple[int, ...] = ()
 
     # Lifetime bounds (task IDs)
-    created_at: int = -1        # Task that creates this tensor
-    last_used_at: int = -1      # Last task that uses this tensor
-    freed_at: int = -1          # Task after which tensor can be freed
+    created_at: int = -1  # Task that creates this tensor
+    last_used_at: int = -1  # Last task that uses this tensor
+    freed_at: int = -1  # Task after which tensor can be freed
 
     # Usage tracking
-    read_by: Set[int] = field(default_factory=set)   # Tasks that read this tensor
+    read_by: Set[int] = field(default_factory=set)  # Tasks that read this tensor
     written_by: Set[int] = field(default_factory=set)  # Tasks that write this tensor
 
     @property
@@ -62,6 +65,7 @@ class TensorLifetime:
 @dataclass
 class MemoryEvent:
     """A memory event at a specific point in execution."""
+
     task_id: int
     event_type: TensorLifeEvent
     tensor_id: int
@@ -174,21 +178,25 @@ class LifetimeAnalyzer:
 
         for tid, lifetime in self._lifetimes.items():
             # Allocation event
-            events.append(MemoryEvent(
-                task_id=lifetime.created_at,
-                event_type=TensorLifeEvent.CREATE,
-                tensor_id=tid,
-                delta_bytes=lifetime.size_bytes,
-            ))
+            events.append(
+                MemoryEvent(
+                    task_id=lifetime.created_at,
+                    event_type=TensorLifeEvent.CREATE,
+                    tensor_id=tid,
+                    delta_bytes=lifetime.size_bytes,
+                )
+            )
 
             # Free event
             if lifetime.freed_at >= 0:
-                events.append(MemoryEvent(
-                    task_id=lifetime.freed_at,
-                    event_type=TensorLifeEvent.FREE,
-                    tensor_id=tid,
-                    delta_bytes=-lifetime.size_bytes,
-                ))
+                events.append(
+                    MemoryEvent(
+                        task_id=lifetime.freed_at,
+                        event_type=TensorLifeEvent.FREE,
+                        tensor_id=tid,
+                        delta_bytes=-lifetime.size_bytes,
+                    )
+                )
 
         # Sort by task order
         events.sort(key=lambda e: (task_order.get(e.task_id, 0), e.event_type.value))
@@ -230,10 +238,7 @@ class LifetimeAnalyzer:
         Returns:
             List of tensor lifetimes that can be freed
         """
-        return [
-            lifetime for lifetime in self._lifetimes.values()
-            if lifetime.freed_at == task_id
-        ]
+        return [lifetime for lifetime in self._lifetimes.values() if lifetime.freed_at == task_id]
 
     def get_live_tensors_at(self, task_id: int) -> List[TensorLifetime]:
         """
@@ -246,7 +251,8 @@ class LifetimeAnalyzer:
             List of live tensor lifetimes
         """
         return [
-            lifetime for lifetime in self._lifetimes.values()
+            lifetime
+            for lifetime in self._lifetimes.values()
             if lifetime.created_at <= task_id <= lifetime.freed_at
         ]
 
@@ -272,10 +278,7 @@ class LifetimeAnalyzer:
             return {}
 
         # Sort tensors by creation time
-        sorted_tensors = sorted(
-            self._lifetimes.values(),
-            key=lambda lt: lt.created_at
-        )
+        sorted_tensors = sorted(self._lifetimes.values(), key=lambda lt: lt.created_at)
 
         # Greedy allocation
         offsets: Dict[int, int] = {}

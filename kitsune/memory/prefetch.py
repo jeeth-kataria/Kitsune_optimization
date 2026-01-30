@@ -6,10 +6,11 @@ Implements prefetching strategies for DataLoaders to hide I/O latency.
 
 from __future__ import annotations
 
-import threading
 import queue
-from typing import Optional, Iterator, Any, Callable, List, Tuple
+import threading
 from dataclasses import dataclass
+from typing import Any, Callable, Iterator, List, Optional, Tuple
+
 import torch
 from torch.utils.data import DataLoader
 
@@ -21,6 +22,7 @@ logger = get_logger(__name__)
 @dataclass
 class PrefetchedBatch:
     """A prefetched batch with metadata."""
+
     data: Any
     index: int
     event: Optional[torch.cuda.Event] = None
@@ -259,7 +261,7 @@ class PinnedDataLoader:
         self._device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # Check if pin_memory is already enabled
-        if hasattr(dataloader, 'pin_memory') and not dataloader.pin_memory:
+        if hasattr(dataloader, "pin_memory") and not dataloader.pin_memory:
             logger.warning(
                 "DataLoader does not have pin_memory=True. "
                 "Consider enabling it for better H2D transfer performance."

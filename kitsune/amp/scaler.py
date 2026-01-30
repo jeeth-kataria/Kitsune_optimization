@@ -7,14 +7,15 @@ and integration with Kitsune's memory pools.
 
 from __future__ import annotations
 
-from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
+
 import torch
 import torch.nn as nn
-from torch.cuda.amp import GradScaler
+from torch.amp import GradScaler
 
-from .config import AMPConfig, get_amp_config, PrecisionMode
 from ..profiler import get_logger
+from .config import AMPConfig, PrecisionMode, get_amp_config
 
 logger = get_logger(__name__)
 
@@ -22,6 +23,7 @@ logger = get_logger(__name__)
 @dataclass
 class ScalerStats:
     """Statistics for gradient scaler."""
+
     scale: float = 65536.0
     growth_tracker: int = 0
     overflow_count: int = 0
@@ -77,6 +79,7 @@ class KitsuneGradScaler:
         # Create underlying PyTorch scaler
         if self._enabled:
             self._scaler = GradScaler(
+                "cuda",
                 init_scale=self._config.init_scale,
                 growth_factor=self._config.growth_factor,
                 backoff_factor=self._config.backoff_factor,
@@ -84,7 +87,7 @@ class KitsuneGradScaler:
                 enabled=True,
             )
         else:
-            self._scaler = GradScaler(enabled=False)
+            self._scaler = GradScaler("cuda", enabled=False)
 
         # Statistics
         self._stats = ScalerStats(scale=self._config.init_scale)
@@ -181,7 +184,7 @@ class KitsuneGradScaler:
                 "overflow_count": self._stats.overflow_count,
                 "update_count": self._stats.update_count,
                 "total_skipped_steps": self._stats.total_skipped_steps,
-            }
+            },
         }
 
     def load_state_dict(self, state_dict: Dict[str, Any]) -> None:

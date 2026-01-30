@@ -15,6 +15,7 @@ from typing import Optional
 
 class LogLevel(Enum):
     """Log level enumeration."""
+
     DEBUG = logging.DEBUG
     INFO = logging.INFO
     WARNING = logging.WARNING
@@ -31,10 +32,10 @@ class ColoredFormatter(logging.Formatter):
     """Formatter that adds colors to log output for terminal display."""
 
     COLORS = {
-        logging.DEBUG: "\033[36m",     # Cyan
-        logging.INFO: "\033[32m",      # Green
-        logging.WARNING: "\033[33m",   # Yellow
-        logging.ERROR: "\033[31m",     # Red
+        logging.DEBUG: "\033[36m",  # Cyan
+        logging.INFO: "\033[32m",  # Green
+        logging.WARNING: "\033[33m",  # Yellow
+        logging.ERROR: "\033[31m",  # Red
         logging.CRITICAL: "\033[35m",  # Magenta
     }
     RESET = "\033[0m"
@@ -45,9 +46,7 @@ class ColoredFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         if self.use_colors and record.levelno in self.COLORS:
-            record.levelname = (
-                f"{self.COLORS[record.levelno]}{record.levelname}{self.RESET}"
-            )
+            record.levelname = f"{self.COLORS[record.levelno]}{record.levelname}{self.RESET}"
         return super().format(record)
 
 

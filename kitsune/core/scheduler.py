@@ -7,19 +7,19 @@ preparing for CUDA stream parallelism in Week 3.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-from collections import deque
 import heapq
 import time
+from abc import ABC, abstractmethod
+from collections import deque
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 import torch
 import torch.nn as nn
 
+from ..utils.logging import get_logger
 from .graph import ComputationGraph, CycleDetectedError
 from .task import Task, TaskStatus, TaskType
-from ..utils.logging import get_logger
 
 logger = get_logger("scheduler")
 
@@ -27,6 +27,7 @@ logger = get_logger("scheduler")
 @dataclass
 class ScheduleStep:
     """A single step in the execution schedule."""
+
     task: Task
     stream_id: int = 0  # CUDA stream assignment (for Week 3)
     wait_for: List[int] = field(default_factory=list)  # Task IDs to wait for
@@ -40,17 +41,20 @@ class ExecutionPlan:
     Contains ordered steps with stream assignments and
     synchronization points.
     """
+
     steps: List[ScheduleStep] = field(default_factory=list)
     num_streams: int = 1
     estimated_time_us: float = 0.0
 
     def add_step(self, task: Task, stream_id: int = 0, wait_for: List[int] = None):
         """Add a step to the plan."""
-        self.steps.append(ScheduleStep(
-            task=task,
-            stream_id=stream_id,
-            wait_for=wait_for or [],
-        ))
+        self.steps.append(
+            ScheduleStep(
+                task=task,
+                stream_id=stream_id,
+                wait_for=wait_for or [],
+            )
+        )
 
     def __len__(self) -> int:
         return len(self.steps)

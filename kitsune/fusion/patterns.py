@@ -7,10 +7,10 @@ single kernels for better performance.
 
 from __future__ import annotations
 
-from typing import List, Set, Tuple, Optional, Dict, Any
+import re
 from dataclasses import dataclass, field
 from enum import Enum, auto
-import re
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ..profiler import get_logger
 
@@ -19,17 +19,18 @@ logger = get_logger(__name__)
 
 class FusionType(Enum):
     """Types of kernel fusion."""
-    ELEMENTWISE = auto()      # Element-wise ops (add, mul, relu, etc.)
-    REDUCTION = auto()        # Reduction ops (sum, mean, etc.)
-    MATMUL_BIAS = auto()      # MatMul + Bias addition
+
+    ELEMENTWISE = auto()  # Element-wise ops (add, mul, relu, etc.)
+    REDUCTION = auto()  # Reduction ops (sum, mean, etc.)
+    MATMUL_BIAS = auto()  # MatMul + Bias addition
     MATMUL_ACTIVATION = auto()  # MatMul + Activation
-    CONV_BN = auto()          # Conv + BatchNorm
-    CONV_BN_RELU = auto()     # Conv + BatchNorm + ReLU
-    ATTENTION = auto()        # Attention pattern (QKV)
-    LAYERNORM = auto()        # LayerNorm components
-    SOFTMAX = auto()          # Softmax components
-    GELU = auto()             # GELU activation
-    CUSTOM = auto()           # User-defined pattern
+    CONV_BN = auto()  # Conv + BatchNorm
+    CONV_BN_RELU = auto()  # Conv + BatchNorm + ReLU
+    ATTENTION = auto()  # Attention pattern (QKV)
+    LAYERNORM = auto()  # LayerNorm components
+    SOFTMAX = auto()  # Softmax components
+    GELU = auto()  # GELU activation
+    CUSTOM = auto()  # User-defined pattern
 
 
 @dataclass
@@ -44,6 +45,7 @@ class FusionPattern:
         min_ops: Minimum operations to trigger fusion
         priority: Higher priority patterns are matched first
     """
+
     name: str
     op_sequence: List[str]
     fusion_type: FusionType
@@ -104,31 +106,74 @@ class FusionPattern:
 
 # Common operation categories
 ELEMENTWISE_OPS = {
-    "add", "sub", "mul", "div", "neg",
-    "relu", "gelu", "silu", "sigmoid", "tanh",
-    "exp", "log", "sqrt", "rsqrt", "abs",
-    "sin", "cos", "pow",
+    "add",
+    "sub",
+    "mul",
+    "div",
+    "neg",
+    "relu",
+    "gelu",
+    "silu",
+    "sigmoid",
+    "tanh",
+    "exp",
+    "log",
+    "sqrt",
+    "rsqrt",
+    "abs",
+    "sin",
+    "cos",
+    "pow",
 }
 
 ACTIVATION_OPS = {
-    "relu", "gelu", "silu", "sigmoid", "tanh",
-    "leaky_relu", "elu", "selu", "softplus",
-    "hardswish", "hardsigmoid", "mish",
+    "relu",
+    "gelu",
+    "silu",
+    "sigmoid",
+    "tanh",
+    "leaky_relu",
+    "elu",
+    "selu",
+    "softplus",
+    "hardswish",
+    "hardsigmoid",
+    "mish",
 }
 
 REDUCTION_OPS = {
-    "sum", "mean", "max", "min", "prod",
-    "var", "std", "norm", "softmax", "log_softmax",
+    "sum",
+    "mean",
+    "max",
+    "min",
+    "prod",
+    "var",
+    "std",
+    "norm",
+    "softmax",
+    "log_softmax",
 }
 
 MATMUL_OPS = {
-    "linear", "matmul", "mm", "bmm", "addmm",
-    "conv1d", "conv2d", "conv3d",
+    "linear",
+    "matmul",
+    "mm",
+    "bmm",
+    "addmm",
+    "conv1d",
+    "conv2d",
+    "conv3d",
 }
 
 NORMALIZATION_OPS = {
-    "batchnorm", "layernorm", "instancenorm", "groupnorm",
-    "batch_norm", "layer_norm", "instance_norm", "group_norm",
+    "batchnorm",
+    "layernorm",
+    "instancenorm",
+    "groupnorm",
+    "batch_norm",
+    "layer_norm",
+    "instance_norm",
+    "group_norm",
 }
 
 
@@ -159,7 +204,6 @@ BUILTIN_PATTERNS = [
         fusion_type=FusionType.MATMUL_ACTIVATION,
         priority=10,
     ),
-
     # Bias + Activation patterns
     FusionPattern(
         name="add_relu",
@@ -173,7 +217,6 @@ BUILTIN_PATTERNS = [
         fusion_type=FusionType.ELEMENTWISE,
         priority=5,
     ),
-
     # Conv + BN + Activation
     FusionPattern(
         name="conv_bn_relu",
@@ -187,7 +230,6 @@ BUILTIN_PATTERNS = [
         fusion_type=FusionType.CONV_BN,
         priority=12,
     ),
-
     # Multiple elementwise operations
     FusionPattern(
         name="elementwise_chain",
@@ -196,7 +238,6 @@ BUILTIN_PATTERNS = [
         min_ops=2,
         priority=3,
     ),
-
     # Activation chains
     FusionPattern(
         name="activation_chain",
@@ -205,7 +246,6 @@ BUILTIN_PATTERNS = [
         min_ops=2,
         priority=2,
     ),
-
     # LayerNorm components
     FusionPattern(
         name="layernorm_fused",
@@ -213,7 +253,6 @@ BUILTIN_PATTERNS = [
         fusion_type=FusionType.LAYERNORM,
         priority=20,
     ),
-
     # Softmax components
     FusionPattern(
         name="softmax_fused",
@@ -221,7 +260,6 @@ BUILTIN_PATTERNS = [
         fusion_type=FusionType.SOFTMAX,
         priority=20,
     ),
-
     # GELU approximation
     FusionPattern(
         name="gelu_approx",
@@ -279,7 +317,7 @@ class PatternMatcher:
                 if i in used_indices:
                     continue
 
-                window = ops[i:i + len(pattern.op_sequence)]
+                window = ops[i : i + len(pattern.op_sequence)]
                 if pattern.matches(window):
                     end_idx = i + len(pattern.op_sequence)
                     matches.append((pattern, i, end_idx))

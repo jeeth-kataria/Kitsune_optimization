@@ -9,26 +9,29 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Any, Callable, Optional, Set, List, Dict
+from typing import Any, Callable, Dict, List, Optional, Set
+
 import torch
 
 
 class TaskType(Enum):
     """Type of task/operation."""
-    COMPUTE = auto()      # GPU computation (matmul, conv, etc.)
-    TRANSFER_H2D = auto() # Host to Device transfer
-    TRANSFER_D2H = auto() # Device to Host transfer
-    SYNC = auto()         # Synchronization point
-    MEMORY = auto()       # Memory allocation/deallocation
+
+    COMPUTE = auto()  # GPU computation (matmul, conv, etc.)
+    TRANSFER_H2D = auto()  # Host to Device transfer
+    TRANSFER_D2H = auto()  # Device to Host transfer
+    SYNC = auto()  # Synchronization point
+    MEMORY = auto()  # Memory allocation/deallocation
 
 
 class TaskStatus(Enum):
     """Execution status of a task."""
-    PENDING = auto()      # Not yet ready to execute
-    READY = auto()        # All dependencies satisfied
-    RUNNING = auto()      # Currently executing
-    COMPLETED = auto()    # Finished execution
-    FAILED = auto()       # Execution failed
+
+    PENDING = auto()  # Not yet ready to execute
+    READY = auto()  # All dependencies satisfied
+    RUNNING = auto()  # Currently executing
+    COMPLETED = auto()  # Finished execution
+    FAILED = auto()  # Execution failed
 
 
 @dataclass
@@ -36,17 +39,17 @@ class TaskCost:
     """Cost estimates for scheduling decisions."""
 
     # Computational cost
-    flops: int = 0                    # Floating point operations
-    estimated_time_us: float = 0.0    # Estimated execution time in microseconds
+    flops: int = 0  # Floating point operations
+    estimated_time_us: float = 0.0  # Estimated execution time in microseconds
 
     # Memory cost
-    memory_read_bytes: int = 0        # Bytes read from memory
-    memory_write_bytes: int = 0       # Bytes written to memory
-    peak_memory_bytes: int = 0        # Peak memory during execution
+    memory_read_bytes: int = 0  # Bytes read from memory
+    memory_write_bytes: int = 0  # Bytes written to memory
+    peak_memory_bytes: int = 0  # Peak memory during execution
 
     # Scheduling hints
-    is_memory_bound: bool = False     # True if memory-bound, False if compute-bound
-    parallelizable: bool = True       # Can run in parallel with other tasks
+    is_memory_bound: bool = False  # True if memory-bound, False if compute-bound
+    parallelizable: bool = True  # Can run in parallel with other tasks
 
     @property
     def memory_total_bytes(self) -> int:
@@ -183,7 +186,7 @@ class Task:
     task_type: TaskType = TaskType.COMPUTE
 
     # Dependencies (task IDs)
-    inputs: Set[int] = field(default_factory=set)   # Tasks this depends on
+    inputs: Set[int] = field(default_factory=set)  # Tasks this depends on
     outputs: Set[int] = field(default_factory=set)  # Tasks that depend on this
 
     # Tensor information
@@ -199,7 +202,7 @@ class Task:
 
     # Scheduling hints
     stream_affinity: Optional[int] = None  # Preferred CUDA stream
-    priority: int = 0                       # Higher = more important
+    priority: int = 0  # Higher = more important
 
     # For execution
     kernel: Optional[Callable] = None

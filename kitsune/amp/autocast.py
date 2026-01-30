@@ -8,12 +8,13 @@ operation-level precision control.
 from __future__ import annotations
 
 from contextlib import contextmanager
-from typing import Optional, Callable, Any, Generator
+from typing import Any, Callable, Generator, Optional
+
 import torch
 import torch.nn as nn
 
-from .config import AMPConfig, PrecisionMode, get_amp_config
 from ..profiler import get_logger
+from .config import AMPConfig, PrecisionMode, get_amp_config
 
 logger = get_logger(__name__)
 
@@ -70,16 +71,17 @@ def autocast_context(
 
     # Handle CPU vs CUDA
     if not torch.cuda.is_available():
-        # CPU autocast (PyTorch 1.10+)
+        # CPU autocast (use new API)
         try:
-            with torch.cpu.amp.autocast(enabled=actual_enabled, dtype=dtype):
+            with torch.amp.autocast("cpu", enabled=actual_enabled, dtype=dtype):
                 yield
         except (AttributeError, RuntimeError):
             # Fallback for older PyTorch or unsupported dtypes
             yield
     else:
-        # CUDA autocast
-        with torch.cuda.amp.autocast(
+        # CUDA autocast (use new API)
+        with torch.amp.autocast(
+            "cuda",
             enabled=actual_enabled,
             dtype=dtype,
             cache_enabled=cache_enabled,
@@ -180,10 +182,7 @@ class PrecisionCast:
             # Check for values that would overflow in FP16
             max_val = tensor.abs().max()
             if max_val > 65504:  # FP16 max
-                logger.warning(
-                    f"Tensor has values > FP16 max ({max_val:.0f}), "
-                    "keeping in FP32"
-                )
+                logger.warning(f"Tensor has values > FP16 max ({max_val:.0f}), " "keeping in FP32")
                 return tensor
 
         return tensor.to(self._target_dtype)

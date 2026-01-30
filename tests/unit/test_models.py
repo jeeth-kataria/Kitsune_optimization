@@ -9,8 +9,8 @@ from tests.benchmarks.models import (
     MLP,
     LeNet,
     ResNet18,
-    create_mlp,
     create_lenet,
+    create_mlp,
     create_resnet18,
     get_model_info,
 )

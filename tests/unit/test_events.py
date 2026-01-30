@@ -6,9 +6,9 @@ import pytest
 import torch
 
 from kitsune.cuda.events import (
-    EventManager,
     DependencyTracker,
     EventBarrier,
+    EventManager,
     get_event_manager,
     reset_event_manager,
 )

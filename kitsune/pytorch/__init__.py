@@ -8,10 +8,10 @@ Contains PyTorch-specific utilities:
 """
 
 from .graph_capture import (
-    GraphCapture,
     FXGraphCapture,
-    HookGraphCapture,
+    GraphCapture,
     GraphCaptureError,
+    HookGraphCapture,
     capture_graph,
 )
 

@@ -7,7 +7,7 @@ Contains common utilities:
 - Configuration management
 """
 
-from .logging import get_logger, configure_logging, LogLevel
+from .logging import LogLevel, configure_logging, get_logger
 
 __all__ = [
     "get_logger",

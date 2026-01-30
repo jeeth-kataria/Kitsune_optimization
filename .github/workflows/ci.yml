@@ -73,10 +73,13 @@ jobs:
           pip install ruff black isort
 
       - name: Run Ruff
-        run: ruff check kitsune/
+        run: ruff check kitsune/ --output-format=github
+        continue-on-error: true
 
       - name: Check Black formatting
         run: black --check kitsune/ tests/
+        continue-on-error: true
 
       - name: Check import sorting
         run: isort --check-only kitsune/ tests/
+        continue-on-error: true

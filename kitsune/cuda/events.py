@@ -8,8 +8,9 @@ between operations on different CUDA streams.
 from __future__ import annotations
 
 import threading
-from typing import Optional, List, Dict, Any, Set
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Set
+
 import torch
 
 from ..profiler import get_logger
@@ -20,6 +21,7 @@ logger = get_logger(__name__)
 @dataclass
 class EventTiming:
     """Timing information from an event pair."""
+
     start_event: torch.cuda.Event
     end_event: torch.cuda.Event
     name: str = ""

@@ -7,15 +7,16 @@ mixed precision casting, and Kitsune integration.
 
 from __future__ import annotations
 
-from typing import Optional, Dict, Any, List, Callable, Iterator
+from typing import Any, Callable, Dict, Iterator, List, Optional
+
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
 
+from ..profiler import get_logger
+from .autocast import autocast_context
 from .config import AMPConfig, get_amp_config
 from .scaler import KitsuneGradScaler, create_grad_scaler
-from .autocast import autocast_context
-from ..profiler import get_logger
 
 logger = get_logger(__name__)
 

@@ -7,11 +7,12 @@ the overhead of frequent malloc/free calls during training.
 
 from __future__ import annotations
 
-import threading
 import math
-from typing import Optional, List, Dict, Tuple, Set
-from dataclasses import dataclass, field
+import threading
 from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Set, Tuple
+
 import torch
 
 from ..profiler import get_logger
@@ -22,6 +23,7 @@ logger = get_logger(__name__)
 @dataclass
 class AllocationStats:
     """Statistics for memory pool allocations."""
+
     total_allocations: int = 0
     total_deallocations: int = 0
     cache_hits: int = 0
@@ -87,6 +89,7 @@ class SizeClass:
 @dataclass
 class CachedBlock:
     """A cached memory block."""
+
     data: torch.Tensor
     size_class: int
     actual_size: int
@@ -151,7 +154,9 @@ class MemoryPool:
         # Thread safety
         self._lock = threading.Lock()
 
-        logger.info(f"MemoryPool initialized on {device}, max cache: {max_cached_bytes / 1e9:.2f}GB")
+        logger.info(
+            f"MemoryPool initialized on {device}, max cache: {max_cached_bytes / 1e9:.2f}GB"
+        )
 
     @property
     def device(self) -> torch.device:
@@ -234,8 +239,7 @@ class MemoryPool:
             self._active_blocks[id(tensor)] = block
             self.stats.bytes_allocated += size_class
             self.stats.peak_bytes_allocated = max(
-                self.stats.peak_bytes_allocated,
-                self.stats.bytes_allocated
+                self.stats.peak_bytes_allocated, self.stats.bytes_allocated
             )
 
         return tensor
@@ -295,6 +299,7 @@ class MemoryPool:
         Yields:
             Allocated tensor (automatically deallocated on exit)
         """
+
         class TempAllocation:
             def __init__(self, pool: MemoryPool, shape: Tuple[int, ...], dtype: torch.dtype):
                 self.pool = pool

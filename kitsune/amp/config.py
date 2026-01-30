@@ -8,17 +8,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Optional, Set, Dict, Any
+from typing import Any, Dict, Optional, Set
+
 import torch
 
 
 class PrecisionMode(Enum):
     """Precision mode for operations."""
-    FP32 = auto()       # Full precision (default PyTorch)
-    FP16 = auto()       # Half precision (float16)
-    BF16 = auto()       # BFloat16 (better dynamic range)
-    TF32 = auto()       # TensorFloat32 (NVIDIA Ampere+)
-    AUTO = auto()       # Automatic selection based on hardware
+
+    FP32 = auto()  # Full precision (default PyTorch)
+    FP16 = auto()  # Half precision (float16)
+    BF16 = auto()  # BFloat16 (better dynamic range)
+    TF32 = auto()  # TensorFloat32 (NVIDIA Ampere+)
+    AUTO = auto()  # Automatic selection based on hardware
 
 
 @dataclass
@@ -37,6 +39,7 @@ class AMPConfig:
         ops_fp32: Operations that must stay in FP32
         ops_fp16: Operations that should use FP16
     """
+
     enabled: bool = True
     precision_mode: PrecisionMode = PrecisionMode.AUTO
     grad_scaler_enabled: bool = True
@@ -46,13 +49,28 @@ class AMPConfig:
     growth_interval: int = 2000
 
     # Operation precision overrides
-    ops_fp32: Set[str] = field(default_factory=lambda: {
-        "softmax", "log_softmax", "layer_norm", "batch_norm",
-        "group_norm", "loss", "cross_entropy", "mse_loss",
-    })
-    ops_fp16: Set[str] = field(default_factory=lambda: {
-        "linear", "conv1d", "conv2d", "conv3d", "matmul", "bmm",
-    })
+    ops_fp32: Set[str] = field(
+        default_factory=lambda: {
+            "softmax",
+            "log_softmax",
+            "layer_norm",
+            "batch_norm",
+            "group_norm",
+            "loss",
+            "cross_entropy",
+            "mse_loss",
+        }
+    )
+    ops_fp16: Set[str] = field(
+        default_factory=lambda: {
+            "linear",
+            "conv1d",
+            "conv2d",
+            "conv3d",
+            "matmul",
+            "bmm",
+        }
+    )
 
     # Dynamic loss scaling
     dynamic_scaling: bool = True

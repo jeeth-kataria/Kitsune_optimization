@@ -17,24 +17,25 @@ configuration and gracefully falls back when needed.
 from __future__ import annotations
 
 import time
-from typing import Optional, Dict, Any, Iterator, Callable, Tuple, List
-from dataclasses import dataclass, field
 from contextlib import contextmanager
+from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
-from ..backends import StableBackend, ExperimentalBackend
+from ..amp import AMPConfig, AMPOptimizer, KitsuneGradScaler, PrecisionMode, autocast_context
+from ..backends import ExperimentalBackend, StableBackend
 from ..cuda import StreamPool, get_stream_pool
+from ..fusion import FusionDetector, FusionEngine, get_fusion_engine
 from ..memory import (
-    MemoryPool,
-    get_memory_pool,
     CUDAPrefetcher,
-    create_prefetched_loader,
     LifetimeAnalyzer,
+    MemoryPool,
+    create_prefetched_loader,
+    get_memory_pool,
 )
-from ..fusion import FusionEngine, FusionDetector, get_fusion_engine
-from ..amp import AMPConfig, PrecisionMode, AMPOptimizer, autocast_context, KitsuneGradScaler
 from ..profiler import Profiler, get_logger
 
 logger = get_logger(__name__)
@@ -43,13 +44,14 @@ logger = get_logger(__name__)
 @dataclass
 class OptimizationConfig:
     """Configuration for Kitsune optimizations."""
+
     # Backend selection
     backend: str = "stable"  # Options: 'stable', 'experimental'
-    
+
     # Stable backend options
     use_compile: bool = True  # Apply torch.compile
     use_cuda_graphs: bool = True  # Capture CUDA graphs
-    
+
     # Stream parallelism (experimental backend)
     num_streams: int = 4
     enable_streams: bool = True
@@ -81,6 +83,7 @@ class OptimizationConfig:
 @dataclass
 class OptimizationStats:
     """Statistics from optimization."""
+
     total_time_ms: float = 0.0
     compute_time_ms: float = 0.0
     transfer_time_ms: float = 0.0
@@ -198,8 +201,7 @@ class KitsuneOptimizer:
                     "auto": PrecisionMode.AUTO,
                 }
                 precision_mode = precision_map.get(
-                    self.config.amp_precision.lower(),
-                    PrecisionMode.AUTO
+                    self.config.amp_precision.lower(), PrecisionMode.AUTO
                 )
             self._amp_config = AMPConfig(precision_mode=precision_mode)
             self._grad_scaler = KitsuneGradScaler(config=self._amp_config)
@@ -385,12 +387,14 @@ class KitsuneOptimizer:
         else:
             lines.append("  AMP: disabled")
 
-        lines.extend([
-            "",
-            "Statistics:",
-            f"  Total iterations: {self.stats.iterations}",
-            f"  Total time: {self.stats.total_time_ms:.2f} ms",
-        ])
+        lines.extend(
+            [
+                "",
+                "Statistics:",
+                f"  Total iterations: {self.stats.iterations}",
+                f"  Total time: {self.stats.total_time_ms:.2f} ms",
+            ]
+        )
 
         if self.stats.iterations > 0:
             avg_time = self.stats.total_time_ms / self.stats.iterations
@@ -400,34 +404,42 @@ class KitsuneOptimizer:
             lines.append(f"  Speedup: {self.stats.speedup:.2f}x")
 
         if self._graph is not None:
-            lines.extend([
-                "",
-                "Graph:",
-                f"  Tasks: {self._graph.num_tasks}",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "Graph:",
+                    f"  Tasks: {self._graph.num_tasks}",
+                ]
+            )
 
         if self._fusion_engine is not None:
-            lines.extend([
-                "",
-                "Fusion:",
-                f"  Backend: {self._fusion_engine.backend}",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "Fusion:",
+                    f"  Backend: {self._fusion_engine.backend}",
+                ]
+            )
 
         if self._memory_pool is not None:
             mem_stats = self._memory_pool.get_stats()
-            lines.extend([
-                "",
-                "Memory Pool:",
-                f"  Hit rate: {mem_stats['hit_rate']:.1%}",
-                f"  Cached: {mem_stats['bytes_cached'] / 1e6:.2f} MB",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "Memory Pool:",
+                    f"  Hit rate: {mem_stats['hit_rate']:.1%}",
+                    f"  Cached: {mem_stats['bytes_cached'] / 1e6:.2f} MB",
+                ]
+            )
 
         if self._grad_scaler is not None:
-            lines.extend([
-                "",
-                "Gradient Scaler:",
-                f"  Current scale: {self._grad_scaler.scale:.0f}",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "Gradient Scaler:",
+                    f"  Current scale: {self._grad_scaler.scale:.0f}",
+                ]
+            )
 
         lines.append("=" * 50)
         return "\n".join(lines)
@@ -440,12 +452,12 @@ def optimize_model(
 ) -> KitsuneOptimizer:
     """
     Quick setup for model optimization.
-    
+
     Applies real optimizations:
-    1. torch.compile for kernel fusion and optimization  
+    1. torch.compile for kernel fusion and optimization
     2. CUDA graph capture for reduced launch overhead
     3. Memory pooling and management
-    
+
     Args:
         model: Model to optimize
         sample_input: Sample input for graph capture
@@ -455,23 +467,20 @@ def optimize_model(
         Configured KitsuneOptimizer with optimized model
     """
     config = OptimizationConfig(**config_kwargs)
-    
+
     # Create optimizer first
     optimizer = KitsuneOptimizer(model, config)
 
     # Capture graph for analysis
     if config.enable_graph_capture:
         optimizer.capture_graph(sample_input)
-    
+
     # Apply real optimizations using the optimized wrapper
     # This combines torch.compile + CUDA graphs for actual speedups
     try:
         logger.info("Creating optimized model wrapper")
         optimized_model = create_optimized_model(
-            model,
-            sample_input,
-            use_cuda_graphs=True,
-            compile_mode="reduce-overhead"
+            model, sample_input, use_cuda_graphs=True, compile_mode="reduce-overhead"
         )
         optimizer.model = optimized_model
         logger.info("Model optimization applied successfully")

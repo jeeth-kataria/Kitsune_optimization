@@ -7,14 +7,14 @@ import torch
 import torch.nn as nn
 
 from kitsune.core.graph import ComputationGraph
-from kitsune.core.task import Task, TaskType
 from kitsune.core.scheduler import (
     DataflowScheduler,
     ExecutionPlan,
-    TopologicalScheduler,
     PriorityScheduler,
+    TopologicalScheduler,
     WavefrontScheduler,
 )
+from kitsune.core.task import Task, TaskType
 
 
 class TestTopologicalScheduler:

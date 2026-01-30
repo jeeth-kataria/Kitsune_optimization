@@ -8,28 +8,31 @@ by overlapping data movement with GPU computation.
 from __future__ import annotations
 
 import threading
-from typing import Optional, List, Callable, Any, Iterator, Tuple
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import Any, Callable, Iterator, List, Optional, Tuple
+
 import torch
 
-from ..profiler import get_logger
 from ..cuda import StreamPool, get_stream_pool
+from ..profiler import get_logger
 
 logger = get_logger(__name__)
 
 
 class BufferState(Enum):
     """State of a buffer in the double buffer system."""
-    EMPTY = auto()      # Buffer is empty/available
-    LOADING = auto()    # Data is being loaded
-    READY = auto()      # Data is ready for consumption
+
+    EMPTY = auto()  # Buffer is empty/available
+    LOADING = auto()  # Data is being loaded
+    READY = auto()  # Data is ready for consumption
     COMPUTING = auto()  # Being used for computation
 
 
 @dataclass
 class Buffer:
     """A single buffer with state tracking."""
+
     data: torch.Tensor
     state: BufferState = BufferState.EMPTY
     event: Optional[torch.cuda.Event] = None

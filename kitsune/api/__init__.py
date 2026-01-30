@@ -8,29 +8,28 @@ Contains device-aware optimization:
 - Device detection and hardware-specific configs
 """
 
+from .device_config import (
+    AmpereConfig,
+    CPUConfig,
+    DeviceType,
+    GenericCUDAConfig,
+    HardwareInfo,
+    HopperConfig,
+    T4Config,
+    apply_hardware_optimizations,
+    detect_hardware,
+    get_optimal_config,
+    print_hardware_info,
+    show_performance_guide,
+)
 from .optimizer_v2 import (
     KitsuneOptimizer,
     OptimizationConfig,
-    optimize_model,
-    optimize,
-    get_optimizer,
     benchmark_optimization,
+    get_optimizer,
+    optimize,
+    optimize_model,
     print_benchmark,
-)
-
-from .device_config import (
-    detect_hardware,
-    get_optimal_config,
-    apply_hardware_optimizations,
-    print_hardware_info,
-    show_performance_guide,
-    HardwareInfo,
-    DeviceType,
-    T4Config,
-    AmpereConfig,
-    HopperConfig,
-    CPUConfig,
-    GenericCUDAConfig,
 )
 
 # Legacy compatibility

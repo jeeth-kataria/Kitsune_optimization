@@ -8,24 +8,19 @@ import torch.nn as nn
 
 from kitsune.amp import (
     AMPConfig,
-    PrecisionMode,
-    get_amp_config,
-    set_amp_config,
-    KitsuneGradScaler,
-    create_grad_scaler,
-    autocast_context,
-    mixed_precision_forward,
-    get_autocast_dtype,
     AMPOptimizer,
+    KitsuneGradScaler,
+    PrecisionMode,
+    autocast_context,
+    create_grad_scaler,
+    get_amp_config,
+    get_autocast_dtype,
+    mixed_precision_forward,
+    set_amp_config,
     wrap_optimizer_with_amp,
 )
+from kitsune.amp.autocast import AutocastModule, PrecisionCast, enable_tf32, get_precision_info
 from kitsune.amp.config import reset_amp_config
-from kitsune.amp.autocast import (
-    AutocastModule,
-    PrecisionCast,
-    enable_tf32,
-    get_precision_info,
-)
 from kitsune.amp.optimizer import AMPTrainer
 
 

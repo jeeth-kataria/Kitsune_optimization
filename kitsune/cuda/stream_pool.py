@@ -8,9 +8,10 @@ operations across multiple streams.
 from __future__ import annotations
 
 import threading
-from typing import Optional, List, Dict, Any, Callable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from typing import Any, Callable, Dict, List, Optional
+
 import torch
 
 from ..profiler import get_logger
@@ -21,6 +22,7 @@ logger = get_logger(__name__)
 @dataclass
 class StreamStats:
     """Statistics for a single CUDA stream."""
+
     stream_id: int
     tasks_executed: int = 0
     total_time_ms: float = 0.0
@@ -167,10 +169,7 @@ class StreamPool:
 
             # Optionally include default stream as stream 0
             if include_default:
-                default_stream = CUDAStream(
-                    stream_id=0,
-                    stream=torch.cuda.default_stream()
-                )
+                default_stream = CUDAStream(stream_id=0, stream=torch.cuda.default_stream())
                 self._streams.append(default_stream)
                 num_streams -= 1
 

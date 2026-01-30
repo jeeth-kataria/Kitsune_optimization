@@ -6,18 +6,18 @@ import pytest
 import torch
 import torch.nn as nn
 
+from kitsune.core import ComputationGraph
 from kitsune.fusion import (
+    BUILTIN_PATTERNS,
+    FusedOperations,
+    FusionCandidate,
+    FusionDetector,
+    FusionEngine,
     FusionPattern,
     FusionType,
     PatternMatcher,
-    FusionDetector,
-    FusionCandidate,
-    FusionEngine,
-    FusedOperations,
-    BUILTIN_PATTERNS,
     is_fusable,
 )
-from kitsune.core import ComputationGraph
 from kitsune.pytorch import capture_graph
 
 
@@ -197,7 +197,9 @@ class TestFusionEngine:
         x = torch.randn(1000, 1000, device="cuda")
 
         results = engine.benchmark_fusion(
-            original, compiled, x,
+            original,
+            compiled,
+            x,
             num_iterations=50,
             warmup=10,
         )

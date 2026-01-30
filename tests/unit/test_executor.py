@@ -7,13 +7,13 @@ import torch
 import torch.nn as nn
 
 from kitsune.core.executor import (
-    StreamExecutor,
+    ExecutionResult,
     ModelExecutor,
     ParallelForwardExecutor,
-    ExecutionResult,
+    StreamExecutor,
 )
-from kitsune.core.scheduler import DataflowScheduler, ExecutionPlan, ScheduleStep
 from kitsune.core.graph import ComputationGraph
+from kitsune.core.scheduler import DataflowScheduler, ExecutionPlan, ScheduleStep
 
 
 class SimpleModel(nn.Module):

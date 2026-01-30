@@ -15,8 +15,8 @@ from typing import Any, Callable, Generator, Optional
 import torch
 
 from .cuda_timer import CUDATimer, TimingResult
-from .memory_tracker import MemoryTracker, MemoryDelta
-from .metrics import Metrics, MetricsCollector, AggregatedMetrics
+from .memory_tracker import MemoryDelta, MemoryTracker
+from .metrics import AggregatedMetrics, Metrics, MetricsCollector
 
 
 @dataclass
@@ -120,7 +120,9 @@ class Profiler:
 
             # Get memory delta
             end_mem = torch.cuda.memory_allocated(self.device) if torch.cuda.is_available() else 0
-            peak_mem = torch.cuda.max_memory_allocated(self.device) if torch.cuda.is_available() else 0
+            peak_mem = (
+                torch.cuda.max_memory_allocated(self.device) if torch.cuda.is_available() else 0
+            )
 
             result.memory = MemoryDelta(
                 name=name,
@@ -244,7 +246,9 @@ class Profiler:
         agg = self._metrics.aggregate()
         if agg:
             lines.append(f"\n--- Training Metrics ({agg.count} iterations) ---")
-            lines.append(f"Average time per iteration: {agg.mean_time_ms:.2f} ± {agg.std_time_ms:.2f} ms")
+            lines.append(
+                f"Average time per iteration: {agg.mean_time_ms:.2f} ± {agg.std_time_ms:.2f} ms"
+            )
             lines.append(f"Throughput: {agg.mean_throughput:.1f} samples/second")
             lines.append(f"Peak memory: {agg.peak_memory_mb:.1f} MB")
 
@@ -267,9 +271,7 @@ class Profiler:
                     mem_str = ""
                     if result.memory:
                         mem_str = f" | Peak: {result.memory.peak_mb:.1f} MB"
-                    lines.append(
-                        f"  {name:30s}: {result.timing.cuda_time_ms:8.2f} ms{mem_str}"
-                    )
+                    lines.append(f"  {name:30s}: {result.timing.cuda_time_ms:8.2f} ms{mem_str}")
 
         lines.append("=" * 70)
         return "\n".join(lines)

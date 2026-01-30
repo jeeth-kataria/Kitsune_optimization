@@ -23,16 +23,16 @@ This package provides optimized backends for different hardware platforms:
    - 2:4 structured sparsity
 """
 
-from .stable import StableBackend
 from .experimental import ExperimentalBackend
+from .stable import StableBackend
 
 # Hardware-specific backends (import with try/except for compatibility)
 try:
     from .t4_optimizer import (
+        T4JITFusionOptimizer,
+        T4MixedPrecisionOptimizer,
         T4Optimizer,
         T4QuantizationOptimizer,
-        T4MixedPrecisionOptimizer,
-        T4JITFusionOptimizer,
     )
 except ImportError:
     T4Optimizer = None
@@ -41,29 +41,19 @@ except ImportError:
     T4JITFusionOptimizer = None
 
 try:
-    from .apple_optimizer import (
-        AppleSiliconOptimizer,
-        AppleMPSOptimizer,
-    )
+    from .apple_optimizer import AppleMPSOptimizer, AppleSiliconOptimizer
 except ImportError:
     AppleSiliconOptimizer = None
     AppleMPSOptimizer = None
 
 try:
-    from .rtx_optimizer import (
-        RTXOptimizer,
-        RTXTF32Optimizer,
-    )
+    from .rtx_optimizer import RTXOptimizer, RTXTF32Optimizer
 except ImportError:
     RTXOptimizer = None
     RTXTF32Optimizer = None
 
 try:
-    from .backend_selector import (
-        get_optimal_backend,
-        detect_platform,
-        PlatformType,
-    )
+    from .backend_selector import PlatformType, detect_platform, get_optimal_backend
 except ImportError:
     get_optimal_backend = None
     detect_platform = None
@@ -71,8 +61,8 @@ except ImportError:
 
 __all__ = [
     # Legacy
-    'StableBackend', 
-    'ExperimentalBackend',
+    "StableBackend",
+    "ExperimentalBackend",
     # T4/Turing
     "T4Optimizer",
     "T4QuantizationOptimizer",

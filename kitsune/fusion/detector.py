@@ -7,19 +7,13 @@ that can be fused into single kernels.
 
 from __future__ import annotations
 
-from typing import List, Dict, Set, Tuple, Optional, Any
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ..core.graph import ComputationGraph
 from ..core.task import Task
-from .patterns import (
-    FusionPattern,
-    FusionType,
-    PatternMatcher,
-    BUILTIN_PATTERNS,
-    is_fusable,
-)
 from ..profiler import get_logger
+from .patterns import BUILTIN_PATTERNS, FusionPattern, FusionType, PatternMatcher, is_fusable
 
 logger = get_logger(__name__)
 
@@ -35,6 +29,7 @@ class FusionCandidate:
         estimated_speedup: Estimated speedup from fusion
         memory_reduction: Estimated memory reduction in bytes
     """
+
     pattern: FusionPattern
     tasks: List[Task]
     estimated_speedup: float = 1.0
@@ -273,7 +268,10 @@ class FusionDetector:
         if candidate.pattern.fusion_type == FusionType.ELEMENTWISE:
             # Elementwise fusion has best memory improvement
             memory_factor = 1.0 + 0.15 * (num_ops - 1)
-        elif candidate.pattern.fusion_type in (FusionType.MATMUL_ACTIVATION, FusionType.CONV_BN_RELU):
+        elif candidate.pattern.fusion_type in (
+            FusionType.MATMUL_ACTIVATION,
+            FusionType.CONV_BN_RELU,
+        ):
             # Fused compute+activation
             memory_factor = 1.2
         elif candidate.pattern.fusion_type == FusionType.LAYERNORM:

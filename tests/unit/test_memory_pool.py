@@ -7,8 +7,8 @@ import torch
 
 from kitsune.memory.pool import (
     MemoryPool,
-    TensorCache,
     SizeClass,
+    TensorCache,
     get_memory_pool,
     reset_memory_pool,
 )
@@ -42,7 +42,7 @@ class TestSizeClass:
         """Test getting all size classes."""
         classes = SizeClass.get_all_classes()
         assert classes[0] == 512
-        assert all(classes[i] == classes[i-1] * 2 for i in range(1, len(classes)))
+        assert all(classes[i] == classes[i - 1] * 2 for i in range(1, len(classes)))
 
 
 class TestMemoryPool:

@@ -6,16 +6,12 @@ import pytest
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
+from kitsune.memory.double_buffer import DoubleBuffer, H2DOverlap, TripleBuffer
 from kitsune.memory.prefetch import (
     AsyncPrefetcher,
     CUDAPrefetcher,
     PinnedDataLoader,
     create_prefetched_loader,
-)
-from kitsune.memory.double_buffer import (
-    DoubleBuffer,
-    TripleBuffer,
-    H2DOverlap,
 )
 
 
